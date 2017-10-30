@@ -1,49 +1,60 @@
-package main
+package textsearch
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net"
 
 	"github.com/blevesearch/bleve"
-
-	pb "earthcube.org/Project418/services/grpcBleveSearch/protobufs"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
+	restful "github.com/emicklei/go-restful"
 )
 
-const (
-	port = ":50051"
-)
-
-// server is used to implement package SearchServer.
-type server struct{}
-
-// DoSearch implements search
-func (s *server) DoSearch(ctx context.Context, in *pb.SearchRequest) (*pb.SearchReply, error) {
-	results := searchCall(in.Name, in.Index)
-	return &pb.SearchReply{Message: "Results: " + results}, nil
+// Foo is a place holder struct
+type Foo struct {
+	Item string
 }
 
-func main() {
-	log.Println("Opening indexes")
+// New fires up the services inside textsearch
+func New() *restful.WebService {
+	service := new(restful.WebService)
+	service.
+		Path("/api/v1/textindex").
+		Doc("P418 text search API").
+		Consumes(restful.MIME_JSON).
+		Produces(restful.MIME_JSON)
 
-	log.Println("Loading grpc server")
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	pb.RegisterSearchServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	service.Route(service.GET("/test").To(SampleCall).
+		Doc("Testing call").
+		Param(service.PathParameter("test", "TESTING: a simple service to roundtrip the code").DataType("string")).
+		Writes(Foo{}).
+		Operation("SampleCall"))
+
+	service.Route(service.GET("/search/{term}").To(SearchCall).
+		Doc("Search call").
+		Param(service.PathParameter("search", "TESTING: first search test").DataType("string")).
+		Writes(Foo{}).
+		Operation("SearchCall"))
+
+	return service
+}
+
+// SampleCall is a simple sample service for testing....
+func SampleCall(request *restful.Request, response *restful.Response) {
+
+	allitems := Foo{Item: "string to send"}
+	response.WriteEntity(allitems)
 }
 
 // First test function..   opens each time..  not what we want..
 // need to open indexes and maintain state
-func searchCall(phrase string, searchIndex string) string {
+func SearchCall(request *restful.Request, response *restful.Response) {
+
+	// Old func line
+	// func searchCall(phrase string, searchIndex string) string {
+	phrase := request.PathParameter("term")
+
+	searchIndex := "" // use all indexes for testing now...
+
 	log.Printf("Search Term: %s \n", phrase)
 
 	// Open all the index files
@@ -108,7 +119,7 @@ func searchCall(phrase string, searchIndex string) string {
 		}
 	}
 
-	return string(jsonResults)
+	response.WriteEntity(string(jsonResults))
 }
 
 func openIndex(indexPath string) (bleve.Index, error) {
