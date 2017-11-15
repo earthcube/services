@@ -1,19 +1,14 @@
 package spatialsearch
 
 import (
-	"github.com/emicklei/go-restful"
-	// "encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/emicklei/go-restful"
 	gj "github.com/kpawlik/geojson"
-	"gopkg.in/mgo.v2/bson"
-	"opencoredata.org/ocdServices/connectors"
-	"opencoredata.org/ocdServices/structs"
 )
 
 type GeoLatLong struct {
@@ -89,7 +84,7 @@ func New() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	service.Route(service.GET("/search/jrso").To(WKTFeaturesJRSO). // TODO make work with WKT or GeoJSON
+	service.Route(service.GET("/search/test").To(WKTFeaturesJRSO). // TODO make work with WKT or GeoJSON
 									Doc("get expeditions from a spatial polygon defined by wkt").
 									Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
 									Param(service.QueryParameter("abstracts", "If set `true` then abstracts are sent, otherwise abstracts are not sent.  Default is not to send").DataType("string")).
@@ -105,156 +100,156 @@ func New() *restful.WebService {
 
 // WKTFeaturesJRSO get features for JRSO data using WKT Polygon string
 func WKTFeaturesJRSO(request *restful.Request, response *restful.Response) {
-	wktstring := request.QueryParameter("geowithin")
-	abstracts := request.QueryParameter("abstracts")
+	// wktstring := request.QueryParameter("geowithin")
+	// abstracts := request.QueryParameter("abstracts")
 
-	session, err := connectors.GetMongoCon()
-	if err != nil {
-		log.Println(err)
-	}
-	defer session.Close()
+	// session, err := connectors.GetMongoCon()
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// defer session.Close()
 
-	// session.SetMode(mgo.Monotonic, true)
-	c := session.DB("expedire").C("featuresAbsGeoJSON") // featuresGeoJSON  and featuresAbsGeoJSON
-	var results []structs.ExpeditionGeoJSON
+	// // session.SetMode(mgo.Monotonic, true)
+	// c := session.DB("expedire").C("featuresAbsGeoJSON") // featuresGeoJSON  and featuresAbsGeoJSON
+	// var results []structs.ExpeditionGeoJSON
 
-	parsedwkt, err := WKTPolygonToFloatArray(wktstring)
-	if err != nil {
-		log.Println(err)
-		response.AddHeader("Content-Type", "text/plain")
-		response.WriteErrorString(http.StatusInternalServerError, err.Error())
-		return
-	}
+	// parsedwkt, err := WKTPolygonToFloatArray(wktstring)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	response.AddHeader("Content-Type", "text/plain")
+	// 	response.WriteErrorString(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
 
-	err = c.Find(bson.M{
-		"coordinates": bson.M{
-			"$geoWithin": bson.M{
-				"$geometry": bson.M{"type": "Polygon", "coordinates": parsedwkt},
-			},
-		},
-	}).All(&results)
+	// err = c.Find(bson.M{
+	// 	"coordinates": bson.M{
+	// 		"$geoWithin": bson.M{
+	// 			"$geometry": bson.M{"type": "Polygon", "coordinates": parsedwkt},
+	// 		},
+	// 	},
+	// }).All(&results)
 
-	if err != nil {
-		log.Printf("Error making spatial call to MongoDB: %v", err)
-		response.AddHeader("Content-Type", "text/plain")
-		response.WriteErrorString(http.StatusBadRequest, err.Error())
-		return
-	}
+	// if err != nil {
+	// 	log.Printf("Error making spatial call to MongoDB: %v", err)
+	// 	response.AddHeader("Content-Type", "text/plain")
+	// 	response.WriteErrorString(http.StatusBadRequest, err.Error())
+	// 	return
+	// }
 
-	// check to see if we got anything, if not return 204, success, no content
-	if len(results) == 0 {
-		log.Printf("Everything OK, no conent\n")
-		response.AddHeader("Content-Type", "text/plain")
-		response.WriteErrorString(http.StatusNoContent, "No features were found in the specified POLYGON") // put in some JSON "empty" here?
-	}
+	// // check to see if we got anything, if not return 204, success, no content
+	// if len(results) == 0 {
+	// 	log.Printf("Everything OK, no conent\n")
+	// 	response.AddHeader("Content-Type", "text/plain")
+	// 	response.WriteErrorString(http.StatusNoContent, "No features were found in the specified POLYGON") // put in some JSON "empty" here?
+	// }
 
-	// Build the geojson section
-	var (
-		// fc *gj.FeatureCollection
-		f  *gj.Feature
-		fa []*gj.Feature
-	)
+	// // Build the geojson section
+	// var (
+	// 	// fc *gj.FeatureCollection
+	// 	f  *gj.Feature
+	// 	fa []*gj.Feature
+	// )
 
-	// feature with propertises
-	for _, item := range results {
+	// // feature with propertises
+	// for _, item := range results {
 
-		// c := gj.Coordinates{}
-		cd := gj.Coordinate{gj.Coord(item.Coordinates[0]), gj.Coord(item.Coordinates[1])}
-		// c = append(c, cd)
+	// 	// c := gj.Coordinates{}
+	// 	cd := gj.Coordinate{gj.Coord(item.Coordinates[0]), gj.Coord(item.Coordinates[1])}
+	// 	// c = append(c, cd)
 
-		// Set prop entries
-		// TODO..  swith on if item.Hole exist.....
-		props := map[string]interface{}{"description": item.Expedition} //  "popupContent": item.Expedition,
-		// "URL": fmt.Sprintf("<a target='_blank' href='http://opencoredata.org/id/expedition/%s/%s/%s'>%s_%s%s</a>",
-		// 	item.Expedition, item.Site, item.Hole, item.Expedition, item.Site, item.Hole)}
-		if item.Uri != "" {
-			props["URI"] = item.Uri
-		}
-		if item.Hole != "" {
-			props["Hole"] = item.Hole
-		}
-		if item.Expedition != "" {
-			props["Expedition"] = item.Expedition
-		}
-		if item.Site != "" {
-			props["Site"] = item.Site
-		}
-		if item.Program != "" {
-			props["Program"] = item.Program
-		}
-		if item.Waterdepth != "" {
-			props["Water Depth"] = item.Waterdepth
-		}
-		if item.CoreCount != "" {
-			props["Core Count"] = item.CoreCount
-		}
-		if item.Initialreportvolume != "" {
-			props["Initial report volume"] = item.Initialreportvolume
-		}
-		if item.Coredata != "" {
-			props["Coredata"] = item.Coredata
-		}
-		if item.Logdata != "" {
-			props["Logdata"] = item.Logdata
-		}
-		if item.Geom != "" {
-			props["Geom"] = item.Geom
-		}
-		if item.Scientificprospectus != "" {
-			props["Scientific prospectus"] = item.Scientificprospectus
-		}
-		if item.CoreRecovery != "" {
-			props["Core Recovery"] = item.CoreRecovery
-		}
-		if item.Penetration != "" {
-			props["Penetration"] = item.Penetration
-		}
-		if item.Scientificreportvolume != "" {
-			props["Scientific report volume"] = item.Scientificreportvolume
-		}
-		if item.Expeditionsite != "" {
-			props["Expedition site"] = item.Expeditionsite
-		}
-		if item.Preliminaryreport != "" {
-			props["Preliminary report"] = item.Preliminaryreport
-		}
-		if item.CoreInterval != "" {
-			props["Core Interval"] = item.CoreInterval
-		}
-		if item.PercentRecovery != "" {
-			props["Percent Recovery"] = item.PercentRecovery
-		}
-		if item.Drilled != "" {
-			props["Drilled"] = item.Drilled
-		}
-		if item.Vcdata != "" {
-			props["VC data"] = item.Vcdata
-		}
-		if item.Note != "" {
-			props["Note"] = item.Note
-		}
-		if item.Prcoeedingreport != "" {
-			props["Prcoeeding report"] = item.Prcoeedingreport
-		}
-		if abstracts == "true" {
-			if item.Abstract != "" {
-				props["Abstracts"] = item.Abstract
-			}
-		}
+	// 	// Set prop entries
+	// 	// TODO..  swith on if item.Hole exist.....
+	// 	props := map[string]interface{}{"description": item.Expedition} //  "popupContent": item.Expedition,
+	// 	// "URL": fmt.Sprintf("<a target='_blank' href='http://opencoredata.org/id/expedition/%s/%s/%s'>%s_%s%s</a>",
+	// 	// 	item.Expedition, item.Site, item.Hole, item.Expedition, item.Site, item.Hole)}
+	// 	if item.Uri != "" {
+	// 		props["URI"] = item.Uri
+	// 	}
+	// 	if item.Hole != "" {
+	// 		props["Hole"] = item.Hole
+	// 	}
+	// 	if item.Expedition != "" {
+	// 		props["Expedition"] = item.Expedition
+	// 	}
+	// 	if item.Site != "" {
+	// 		props["Site"] = item.Site
+	// 	}
+	// 	if item.Program != "" {
+	// 		props["Program"] = item.Program
+	// 	}
+	// 	if item.Waterdepth != "" {
+	// 		props["Water Depth"] = item.Waterdepth
+	// 	}
+	// 	if item.CoreCount != "" {
+	// 		props["Core Count"] = item.CoreCount
+	// 	}
+	// 	if item.Initialreportvolume != "" {
+	// 		props["Initial report volume"] = item.Initialreportvolume
+	// 	}
+	// 	if item.Coredata != "" {
+	// 		props["Coredata"] = item.Coredata
+	// 	}
+	// 	if item.Logdata != "" {
+	// 		props["Logdata"] = item.Logdata
+	// 	}
+	// 	if item.Geom != "" {
+	// 		props["Geom"] = item.Geom
+	// 	}
+	// 	if item.Scientificprospectus != "" {
+	// 		props["Scientific prospectus"] = item.Scientificprospectus
+	// 	}
+	// 	if item.CoreRecovery != "" {
+	// 		props["Core Recovery"] = item.CoreRecovery
+	// 	}
+	// 	if item.Penetration != "" {
+	// 		props["Penetration"] = item.Penetration
+	// 	}
+	// 	if item.Scientificreportvolume != "" {
+	// 		props["Scientific report volume"] = item.Scientificreportvolume
+	// 	}
+	// 	if item.Expeditionsite != "" {
+	// 		props["Expedition site"] = item.Expeditionsite
+	// 	}
+	// 	if item.Preliminaryreport != "" {
+	// 		props["Preliminary report"] = item.Preliminaryreport
+	// 	}
+	// 	if item.CoreInterval != "" {
+	// 		props["Core Interval"] = item.CoreInterval
+	// 	}
+	// 	if item.PercentRecovery != "" {
+	// 		props["Percent Recovery"] = item.PercentRecovery
+	// 	}
+	// 	if item.Drilled != "" {
+	// 		props["Drilled"] = item.Drilled
+	// 	}
+	// 	if item.Vcdata != "" {
+	// 		props["VC data"] = item.Vcdata
+	// 	}
+	// 	if item.Note != "" {
+	// 		props["Note"] = item.Note
+	// 	}
+	// 	if item.Prcoeedingreport != "" {
+	// 		props["Prcoeeding report"] = item.Prcoeedingreport
+	// 	}
+	// 	if abstracts == "true" {
+	// 		if item.Abstract != "" {
+	// 			props["Abstracts"] = item.Abstract
+	// 		}
+	// 	}
 
-		// newp := gj.NewMultiPoint(c)
-		newp := gj.NewPoint(cd)
-		f = gj.NewFeature(newp, props, nil)
-		fa = append(fa, f)
-	}
+	// 	// newp := gj.NewMultiPoint(c)
+	// 	newp := gj.NewPoint(cd)
+	// 	f = gj.NewFeature(newp, props, nil)
+	// 	fa = append(fa, f)
+	// }
 
-	fc := gj.FeatureCollection{Type: "FeatureCollection", Features: fa}
-	gjstr, err := gj.Marshal(fc)
-	if err != nil {
-		log.Println(err)
-	}
+	// fc := gj.FeatureCollection{Type: "FeatureCollection", Features: fa}
+	// gjstr, err := gj.Marshal(fc)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 
-	response.Write([]byte(gjstr))
+	response.Write([]byte("The edge of our universe for now...."))
 }
 
 // WKTPolygonToFloatArray return float64 array for WKT Poly string
