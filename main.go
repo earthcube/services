@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"earthcube.org/Project418/services/spatialsearch"
 	"earthcube.org/Project418/services/textsearch"
 	restful "github.com/emicklei/go-restful"
 	swagger "github.com/emicklei/go-restful-swagger12"
@@ -24,7 +25,9 @@ func main() {
 	wsContainer.Filter(wsContainer.OPTIONSFilter)
 
 	// Add the services
-	wsContainer.Add(textsearch.New())  // text search services
+	wsContainer.Add(textsearch.New())    // text search services
+	wsContainer.Add(spatialsearch.New()) // text spatial services
+	// wsContainer.Add(graphsearch.New())  // text graph services
 
 	// Swagger
 	config := swagger.Config{
