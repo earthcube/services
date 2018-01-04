@@ -1,6 +1,7 @@
 package spatialsearch
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -8,8 +9,14 @@ import (
 	"strings"
 
 	"github.com/emicklei/go-restful"
+	"github.com/garyburd/redigo/redis"
 	gj "github.com/kpawlik/geojson"
 )
+
+type Location struct {
+	Type        string    `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
+}
 
 type GeoLatLong struct {
 	id           string `bson:"_id,omitempty"` // I don't really want the ID, so leave it lower case
@@ -84,7 +91,7 @@ func New() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	service.Route(service.GET("/search/test").To(WKTFeaturesJRSO). // TODO make work with WKT or GeoJSON
+	service.Route(service.GET("/search/test1").To(WKTFeaturesJRSO). // TODO make work with WKT or GeoJSON
 									Doc("get expeditions from a spatial polygon defined by wkt").
 									Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
 									Param(service.QueryParameter("abstracts", "If set `true` then abstracts are sent, otherwise abstracts are not sent.  Default is not to send").DataType("string")).
@@ -95,7 +102,84 @@ func New() *restful.WebService {
 	// “application/json; profile=vnd.laccore.flyovercountry version=1”
 	// "application/json;vnd.laccore.flyovercountry+v1"
 
+	service.Route(service.GET("/search/test2").To(SpatialCall). // TODO make work with WKT or GeoJSON
+									Doc("get expeditions from a spatial polygon defined by wkt").
+									Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
+									Param(service.QueryParameter("abstracts", "If set `true` then abstracts are sent, otherwise abstracts are not sent.  Default is not to send").DataType("string")).
+									ReturnsError(400, "Unable to handle request", nil).
+									Operation("WKTFeaturesJRSO"))
+
 	return service
+}
+
+// SpatialCall calls to tile38 data store
+func SpatialCall(request *restful.Request, response *restful.Response) {
+
+	c, err := redis.Dial("tcp", "localhost:9851")
+	if err != nil {
+		log.Fatalf("Could not connect: %v\n", err)
+	}
+	defer c.Close()
+
+	log.Print("connected")
+
+	var value1 int
+	var value2 []interface{}
+	// var value2 []GeoReturn
+	// reply, err := redis.Values(c.Do("INTERSECTS", "p418", "OBJECT", dataExample(), "OBJECT"))
+	reply, err := redis.Values(c.Do("SCAN", "p418"))
+	if err != nil {
+		fmt.Printf("Error in reply %v \n", err)
+	}
+	if _, err := redis.Scan(reply, &value1, &value2); err != nil {
+		fmt.Printf("Error in scan %v \n", err)
+	}
+
+	// sp := fmt.Sprintf("%s", value2)
+	fmt.Println(value1)
+	// fmt.Println(sp)
+
+	results, _ := tile38RespAsGeoJSON(value2)
+	response.Write([]byte(results))
+
+}
+
+func tile38RespAsGeoJSON(results []interface{}) (string, error) {
+
+	// Build the geojson section
+	var (
+		// fc *gj.FeatureCollection
+		f  *gj.Feature
+		fa []*gj.Feature
+	)
+
+	for _, item := range results {
+		valcast := item.([]interface{})
+		val0 := fmt.Sprintf("%s", valcast[0])
+		val1 := fmt.Sprintf("%s", valcast[1])
+
+		loc := &Location{}
+		err := json.Unmarshal([]byte(val1), loc)
+		if err != nil {
+			return "", err
+		}
+
+		cd := gj.Coordinate{gj.Coord(loc.Coordinates[1]), gj.Coord(loc.Coordinates[0])} // is this long lat..  vs lat long?
+
+		props := map[string]interface{}{"URL": val0}
+
+		newp := gj.NewPoint(cd)
+		f = gj.NewFeature(newp, props, nil)
+		fa = append(fa, f)
+	}
+
+	fc := gj.FeatureCollection{Type: "FeatureCollection", Features: fa}
+	gjstr, err := gj.Marshal(fc)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return gjstr, nil
 }
 
 // WKTFeaturesJRSO get features for JRSO data using WKT Polygon string
@@ -150,7 +234,7 @@ func WKTFeaturesJRSO(request *restful.Request, response *restful.Response) {
 	// 	fa []*gj.Feature
 	// )
 
-	// // feature with propertises
+	// // feature with properties
 	// for _, item := range results {
 
 	// 	// c := gj.Coordinates{}
