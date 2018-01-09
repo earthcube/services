@@ -13,75 +13,13 @@ import (
 	gj "github.com/kpawlik/geojson"
 )
 
+// Location is a simple type and cooridnates struct for schema.org spatial info
 type Location struct {
 	Type        string    `json:"type"`
 	Coordinates []float64 `json:"coordinates"`
 }
 
-type GeoLatLong struct {
-	id           string `bson:"_id,omitempty"` // I don't really want the ID, so leave it lower case
-	Opencoresite string
-	Spatial      Spatial
-}
-
-type Spatial struct {
-	Geo Geo
-}
-
-type Geo struct {
-	Latitude  string `json:"latitude"`
-	Longitude string `json:"longitude"`
-}
-
-type CruiseGL struct {
-	Expedition    string `modeDescription:"Cruise GL Struct". description:"Exepedition docs"`
-	CruiseType    string `description:"Cruise Type "`
-	EndPortCall   string `description:"Ending port call"`
-	Operator      string `description:"Operator"`
-	Participant   string `description:"Participant"`
-	Program       string `description:"Program"`
-	Scheduler     string `description:"Scheduler"`
-	StartPortCall string `description:"Start Port Call"`
-	LegSiteHole   string `description:"Leg Site Hole"`
-	Track         string `description:"Track"`
-	Vessel        string `description:"Vessel"`
-	Note          string `description:"Note"`
-	URI           string `description:"URI"`
-}
-
-// CSDCO struct for informationrelated to CSDCO projects
-// TODO  remove the _ from the structs..  should not be used...
-type CSDCO struct {
-	LocationName           string
-	LocationType           string
-	Project                string
-	LocationID             string
-	Site                   string
-	Hole                   string
-	SiteHole               string
-	OriginalID             string
-	HoleID                 string
-	Platform               string
-	Date                   string
-	WaterDepthM            string
-	Country                string
-	State_Province         string
-	County_Region          string
-	PI                     string
-	Lat                    string
-	Long                   string
-	Elevation              string
-	Position               string
-	StorageLocationWorking string
-	StorageLocationArchive string
-	SampleType             string
-	Comment                string
-	mblfT                  string
-	mblfB                  string
-	MetadataSource         string
-}
-
-// might need one for other metadata too...
+// New builds out the services calls..
 func New() *restful.WebService {
 	service := new(restful.WebService)
 
@@ -91,29 +29,23 @@ func New() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	service.Route(service.GET("/search/test1").To(WKTFeaturesJRSO). // TODO make work with WKT or GeoJSON
+	service.Route(service.GET("/search/test1").To(SpatialCall). // TODO make work with WKT or GeoJSON
 									Doc("get expeditions from a spatial polygon defined by wkt").
 									Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
-									Param(service.QueryParameter("abstracts", "If set `true` then abstracts are sent, otherwise abstracts are not sent.  Default is not to send").DataType("string")).
 									ReturnsError(400, "Unable to handle request", nil).
-									Operation("WKTFeaturesJRSO"))
+									Operation("SpatialCall"))
 	// Consumes("application/vnd.flyovercountry.v1+json")  // Is this a good approach?
 	// “application/vnd.laccore.flyovercountry+json; version=1”
 	// “application/json; profile=vnd.laccore.flyovercountry version=1”
 	// "application/json;vnd.laccore.flyovercountry+v1"
-
-	service.Route(service.GET("/search/test2").To(SpatialCall). // TODO make work with WKT or GeoJSON
-									Doc("get expeditions from a spatial polygon defined by wkt").
-									Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
-									Param(service.QueryParameter("abstracts", "If set `true` then abstracts are sent, otherwise abstracts are not sent.  Default is not to send").DataType("string")).
-									ReturnsError(400, "Unable to handle request", nil).
-									Operation("WKTFeaturesJRSO"))
 
 	return service
 }
 
 // SpatialCall calls to tile38 data store
 func SpatialCall(request *restful.Request, response *restful.Response) {
+
+	wktstring := request.QueryParameter("geowithin")
 
 	c, err := redis.Dial("tcp", "localhost:9851")
 	if err != nil {
@@ -125,9 +57,8 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	var value1 int
 	var value2 []interface{}
-	// var value2 []GeoReturn
-	// reply, err := redis.Values(c.Do("INTERSECTS", "p418", "OBJECT", dataExample(), "OBJECT"))
-	reply, err := redis.Values(c.Do("SCAN", "p418"))
+	reply, err := redis.Values(c.Do("INTERSECTS", "p418", "LIMIT", "50000", "OBJECT", wktstring))
+	// reply, err := redis.Values(c.Do("SCAN", "p418"))
 	if err != nil {
 		fmt.Printf("Error in reply %v \n", err)
 	}
@@ -135,13 +66,10 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 		fmt.Printf("Error in scan %v \n", err)
 	}
 
-	// sp := fmt.Sprintf("%s", value2)
 	fmt.Println(value1)
-	// fmt.Println(sp)
 
 	results, _ := tile38RespAsGeoJSON(value2)
 	response.Write([]byte(results))
-
 }
 
 func tile38RespAsGeoJSON(results []interface{}) (string, error) {
