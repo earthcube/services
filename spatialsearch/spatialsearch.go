@@ -47,9 +47,9 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	wktstring := request.QueryParameter("geowithin")
 
-	c, err := redis.Dial("tcp", "localhost:9851")
+	c, err := redis.Dial("tcp", "tile38:9851")
 	if err != nil {
-		log.Fatalf("Could not connect: %v\n", err)
+		log.Printf("Could not connect: %v\n", err)
 	}
 	defer c.Close()
 
