@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
+	"strconv"
 
 	"github.com/blevesearch/bleve"
 	restful "github.com/emicklei/go-restful"
@@ -23,35 +25,37 @@ func New() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	service.Route(service.GET("/test").To(SampleCall).
-		Doc("Testing call").
-		Param(service.PathParameter("test", "TESTING: a simple service to roundtrip the code").DataType("string")).
-		Writes(Foo{}).
-		Operation("SampleCall"))
-
-	service.Route(service.GET("/search/{term}").To(SearchCall).
+		// add in start point and length cursors
+	service.Route(service.GET("/search").To(SearchCall).
 		Doc("Search call").
-		Param(service.PathParameter("search", "TESTING: first search test").DataType("string")).
+		Param(service.QueryParameter("q", "Query string").DataType("string")).
+		Param(service.QueryParameter("s", "Starting cursor point").DataType("int")).
+		Param(service.QueryParameter("n", "Number of results to return").DataType("int")).
 		Writes(Foo{}).
 		Operation("SearchCall"))
 
 	return service
 }
 
-// SampleCall is a simple sample service for testing....
-func SampleCall(request *restful.Request, response *restful.Response) {
-
-	allitems := Foo{Item: "string to send"}
-	response.WriteEntity(allitems)
-}
-
-// First test function..   opens each time..  not what we want..
+// SearchCall First test function..   opens each time..  not what we want..
 // need to open indexes and maintain state
 func SearchCall(request *restful.Request, response *restful.Response) {
 
 	// Old func line
 	// func searchCall(phrase string, searchIndex string) string {
-	phrase := request.PathParameter("term")
+	phrase := request.QueryParameter("q")
+	startPoint, err := strconv.ParseInt(request.QueryParameter("s"), 10, 32)
+	if err != nil {
+		log.Printf("Error with index1 alias: %v", err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	numToReturn, err := strconv.ParseInt(request.QueryParameter("n"), 10, 32)
+	if err != nil {
+		log.Printf("Error with index1 alias: %v", err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
 
 	searchIndex := "" // use all indexes for testing now...
 
@@ -59,32 +63,32 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 
 	// Open all the index files
 	// TODO  really should only open the ones I already know will be in the index alias
-	index1, err := openIndex("/Users/dfils/Data/OCDDataVolumes/indexes/abstracts.bleve")
+	index1, err := openIndex("indexes/bcodmo.bleve")
 	if err != nil {
 		log.Printf("Error with index1 alias: %v", err)
 	}
-	index2, err := openIndex("/Users/dfils/Data/OCDDataVolumes/indexes/csdco.bleve")
+	index2, err := openIndex("indexes/ocd.bleve")
 	if err != nil {
 		log.Printf("Error with index2 alias: %v", err)
 	}
-	index3, err := openIndex("/Users/dfils/Data/OCDDataVolumes/indexes/janus.bleve")
+	index3, err := openIndex("indexes/linkedearth.bleve")
 	if err != nil {
 		log.Printf("Error with index3 alias: %v", err)
 	}
 
 	var index bleve.IndexAlias
 
-	if searchIndex == "abstracts" {
+	if searchIndex == "bcodmo" {
 		index = bleve.NewIndexAlias(index1)
-		log.Println("abstract index only")
+		log.Println("BCODMO index only")
 	}
-	if searchIndex == "csdco" {
+	if searchIndex == "ocd" {
 		index = bleve.NewIndexAlias(index2)
-		log.Println("CSDCO index only")
+		log.Println("OCD index only")
 	}
-	if searchIndex == "jrso" {
+	if searchIndex == "linkedearth" {
 		index = bleve.NewIndexAlias(index3)
-		log.Println("JRSO index only")
+		log.Println("LinkedEarth index only")
 	} else {
 		index = bleve.NewIndexAlias(index1, index2, index3)
 		log.Println("All indexes active")
@@ -93,9 +97,9 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 	// Set up query and search
 	// query := bleve.NewMatchQuery(phrase)
 	query := bleve.NewQueryStringQuery(phrase)
-	search := bleve.NewSearchRequestOptions(query, 10, 0, false) // no explanation
-	search.Highlight = bleve.NewHighlight()                      // need Stored and IncludeTermVectors in index
-	// search.Highlight = bleve.NewHighlightWithStyle("html") // need Stored and IncludeTermVectors in index
+	search := bleve.NewSearchRequestOptions(query, int(numToReturn), int(startPoint), false) // no explanation
+	// search.Highlight = bleve.NewHighlight()                      // need Stored and IncludeTermVectors in index
+	search.Highlight = bleve.NewHighlightWithStyle("html") // need Stored and IncludeTermVectors in index
 
 	var jsonResults []byte // will hold our results
 

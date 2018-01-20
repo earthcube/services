@@ -8,6 +8,8 @@ FROM scratch
 # later as the indexes grow
 ADD services /
 
+# NOTE make sure to mount the bleve indexes to /index
+
 # Add our binary
 CMD ["/services"]
 
