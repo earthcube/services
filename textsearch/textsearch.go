@@ -10,7 +10,7 @@ import (
 	restful "github.com/emicklei/go-restful"
 )
 
-// Foo is a place holder struct
+// OrganicResults is a place holder struct
 type OrganicResults struct {
 	Position int
 	Index    string
