@@ -1,7 +1,6 @@
 package textsearch
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,8 +11,11 @@ import (
 )
 
 // Foo is a place holder struct
-type Foo struct {
-	Item string
+type OrganicResults struct {
+	Position int
+	Index    string
+	Score    float64
+	ID       string
 }
 
 // New fires up the services inside textsearch
@@ -31,7 +33,8 @@ func New() *restful.WebService {
 		Param(service.QueryParameter("q", "Query string").DataType("string")).
 		Param(service.QueryParameter("s", "Starting cursor point").DataType("int")).
 		Param(service.QueryParameter("n", "Number of results to return").DataType("int")).
-		Writes(Foo{}).
+		Param(service.QueryParameter("i", "Index to use.  Currently one of; ocd, bcodmo, linkedearth").DataType("string")).
+		Writes([]OrganicResults{}).
 		Operation("SearchCall"))
 
 	return service
@@ -58,6 +61,9 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 	}
 
 	searchIndex := "" // use all indexes for testing now...
+	searchIndex = request.QueryParameter("i")
+	// TODO.  Make a string array of search index options and then test here to make sure
+	// searchIndex is NOT "" that it is in the array via contains call
 
 	log.Printf("Search Term: %s \n", phrase)
 
@@ -101,7 +107,8 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 	// search.Highlight = bleve.NewHighlight()                      // need Stored and IncludeTermVectors in index
 	search.Highlight = bleve.NewHighlightWithStyle("html") // need Stored and IncludeTermVectors in index
 
-	var jsonResults []byte // will hold our results
+	// var jsonResults []byte // will hold our results
+	var ora []OrganicResults
 
 	// do search and get results
 	searchResults, err := index.Search(search)
@@ -109,13 +116,15 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 		log.Printf("Error in search call: %v", err)
 	} else {
 		hits := searchResults.Hits
-		jsonResults, err = json.MarshalIndent(hits, " ", " ")
+		// jsonResults, err = json.MarshalIndent(hits, "", " ")
 		if err != nil {
 			log.Printf("Error with json marshal call: %v", err)
 		}
 
 		// testing print loop
 		for k, item := range hits {
+			ors := OrganicResults{Position: k, Index: item.Index, Score: item.Score, ID: item.ID}
+			ora = append(ora, ors)
 			fmt.Printf("\n%d: %s, %f, %s, %v\n", k, item.Index, item.Score, item.ID, item.Fragments)
 			for key, frag := range item.Fragments {
 				fmt.Printf("%s   %s\n", key, frag)
@@ -123,7 +132,8 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 		}
 	}
 
-	response.WriteEntity(string(jsonResults))
+	// response.WriteEntity(string(jsonResults))
+	response.WriteEntity(ora)
 }
 
 func openIndex(indexPath string) (bleve.Index, error) {
