@@ -6,10 +6,10 @@ import (
 
 // ResourceResults is a place holder struct
 type ResourceResults struct {
-	Position int
-	Index    string
-	Score    float64
-	ID       string
+	Val     string
+	Desc    string
+	PubName string
+	PubURL  string
 }
 
 // New fires up the services to query the graph
