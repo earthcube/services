@@ -68,9 +68,10 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	log.Print("connected")
 
-	var value1 int
+	var value1 int // we seem to be getting RESP back..
 	var value2 []interface{}
 	reply, err := redis.Values(c.Do("INTERSECTS", "p418", "LIMIT", "50000", "OBJECT", wktstring))
+	// reply, err := redis.String(c.Do("INTERSECTS", "p418", "LIMIT", "50000", "OBJECT", wktstring))
 	// reply, err := redis.Values(c.Do("SCAN", "p418"))
 	if err != nil {
 		fmt.Printf("Error in reply %v \n", err)
@@ -81,10 +82,13 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	fmt.Println(value1)
 
-	results, _ := tile38RespAsGeoJSON(value2)
-	response.Write([]byte(results))
+
+	// results, _ := tile38RespAsGeoJSON(value2)
+	// response.Write([]byte(results))
+	response.Write([]byte("Hi there"))
 }
 
+// this is a a lot of pointless work!
 func tile38RespAsGeoJSON(results []interface{}) (string, error) {
 
 	// Build the geojson section
@@ -128,6 +132,8 @@ func tile38RespAsGeoJSON(results []interface{}) (string, error) {
 			}
 		}
 
+		// ugh..  must I deconstruct and restructure what I know if valid GeoJSON?
+		// Can I always ensure my spatial index is made of geojson..  since we build it..
 		if lt.Type == "Polygon" {
 			log.Println("add poly")
 			lp := &LocationPoly{}
