@@ -13,10 +13,27 @@ import (
 	gj "github.com/kpawlik/geojson"
 )
 
-// Location is a simple type and cooridnates struct for schema.org spatial info
-type Location struct {
+// LocType is there to do a first cut marshalling to just get the type before  next marshalling
+type LocType struct {
+	Type string `json:"type"`
+}
+
+// LocationPoint is a simple type and cooridnates struct for schema.org spatial info
+type LocationPoint struct {
 	Type        string    `json:"type"`
 	Coordinates []float64 `json:"coordinates"`
+}
+
+// LocationPoly is a simple type and cooridnates struct for schema.org spatial info
+type LocationPoly struct {
+	Type        string        `json:"type"`
+	Coordinates [][][]float64 `json:"coordinates"`
+}
+
+// LocationFeature is a simple type and cooridnates struct for schema.org spatial info
+type LocationFeature struct {
+	Type     string       `json:"type"`
+	Geometry LocationPoly `json:"geometry"`
 }
 
 // New builds out the services calls..
@@ -34,11 +51,6 @@ func New() *restful.WebService {
 		Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
 		ReturnsError(400, "Unable to handle request", nil).
 		Operation("SpatialCall"))
-	// Consumes("application/vnd.flyovercountry.v1+json")  // Is this a good approach?
-	// “application/vnd.laccore.flyovercountry+json; version=1”
-	// “application/json; profile=vnd.laccore.flyovercountry version=1”
-	// "application/json;vnd.laccore.flyovercountry+v1"
-
 	return service
 }
 
@@ -47,8 +59,8 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	wktstring := request.QueryParameter("geowithin")
 
-	c, err := redis.Dial("tcp", "tile38:9851")
-	// c, err := redis.Dial("tcp", "localhost:9851")
+	// c, err := redis.Dial("tcp", "tile38:9851")
+	c, err := redis.Dial("tcp", "localhost:9851")
 	if err != nil {
 		log.Printf("Could not connect: %v\n", err)
 	}
@@ -87,19 +99,57 @@ func tile38RespAsGeoJSON(results []interface{}) (string, error) {
 		val0 := fmt.Sprintf("%s", valcast[0])
 		val1 := fmt.Sprintf("%s", valcast[1])
 
-		loc := &Location{}
-		err := json.Unmarshal([]byte(val1), loc)
+		log.Printf("%s  %s", val0, val1)
+
+		// serialize val1 to a simple struct with just type
+		// then move on to the next level of serilization seen below
+
+		lt := &LocType{}
+		err := json.Unmarshal([]byte(val1), lt)
 		if err != nil {
+			log.Print(err)
 			return "", err
 		}
 
-		cd := gj.Coordinate{gj.Coord(loc.Coordinates[0]), gj.Coord(loc.Coordinates[1])} // is this long lat..  vs lat long?
+		if lt.Type == "Point" {
+			lp := &LocationPoint{}
+			err := json.Unmarshal([]byte(val1), lp)
+			if err != nil {
+				log.Print(err)
+				return "", err
+			}
+			if lp.Type == "Point" {
+				log.Println("add point")
+				cd := gj.Coordinate{gj.Coord(lp.Coordinates[0]), gj.Coord(lp.Coordinates[1])} // is this long lat..  vs lat long?
+				props := map[string]interface{}{"URL": val0}
+				newp := gj.NewPoint(cd)
+				f = gj.NewFeature(newp, props, nil)
+				fa = append(fa, f)
+			}
+		}
 
-		props := map[string]interface{}{"URL": val0}
+		if lt.Type == "Polygon" {
+			log.Println("add poly")
+			lp := &LocationPoly{}
+			err := json.Unmarshal([]byte(val1), lp)
+			if err != nil {
+				log.Print(err)
+				return "", err
+			}
+			log.Print(lp)
+		}
 
-		newp := gj.NewPoint(cd)
-		f = gj.NewFeature(newp, props, nil)
-		fa = append(fa, f)
+		if lt.Type == "Feature" {
+			log.Println("add feature")
+			lf := &LocationFeature{}
+			err := json.Unmarshal([]byte(val1), lf)
+			if err != nil {
+				log.Print(err)
+				return "", err
+			}
+			log.Print(lf)
+		}
+
 	}
 
 	fc := gj.FeatureCollection{Type: "FeatureCollection", Features: fa}
@@ -107,6 +157,8 @@ func tile38RespAsGeoJSON(results []interface{}) (string, error) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	// log.Println(gjstr)
 
 	return gjstr, nil
 }

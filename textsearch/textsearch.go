@@ -44,9 +44,9 @@ func New() *restful.WebService {
 // need to open indexes and maintain state
 func SearchCall(request *restful.Request, response *restful.Response) {
 
-	// Old func line
-	// func searchCall(phrase string, searchIndex string) string {
+	// Old func line func searchCall(phrase string, searchIndex string) string {
 	phrase := request.QueryParameter("q")
+	log.Printf("Search Term: %s \n", phrase)
 	startPoint, err := strconv.ParseInt(request.QueryParameter("s"), 10, 32)
 	if err != nil {
 		log.Printf("Error with index1 alias: %v", err)
@@ -60,51 +60,52 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 		return
 	}
 
+	// index maps  (TODO later build from a config file, so not hard coded)
+	im := make(map[string]string)
+	im["bcodmo"] = "indexes/bcodmo.bleve"
+	im["ocd"] = "indexes/ocd.bleve"
+	im["linkedearth"] = "indexes/linkedearth.bleve"
+	im["rwg"] = "indexes/rwg.bleve"
+	im["ieda"] = "indexes/ieda.bleve"
+	im["csdco"] = "indexes/csdco.bleve"
+
 	searchIndex := "" // use all indexes for testing now...
 	searchIndex = request.QueryParameter("i")
-	// TODO.  Make a string array of search index options and then test here to make sure
-	// searchIndex is NOT "" that it is in the array via contains call
-
-	log.Printf("Search Term: %s \n", phrase)
-
-	// Open all the index files
-	// TODO  really should only open the ones I already know will be in the index alias
-	index1, err := openIndex("indexes/bcodmo.bleve")
-	if err != nil {
-		log.Printf("Error with index1 alias: %v", err)
-	}
-	index2, err := openIndex("indexes/ocd.bleve")
-	if err != nil {
-		log.Printf("Error with index2 alias: %v", err)
-	}
-	index3, err := openIndex("indexes/linkedearth.bleve")
-	if err != nil {
-		log.Printf("Error with index3 alias: %v", err)
+	if searchIndex != "" {
+		if val, ok := im[searchIndex]; !ok {
+			log.Printf("Requested unknown index %s, %s", searchIndex, val)
+			response.WriteHeader(http.StatusUnprocessableEntity)
+			return
+		}
 	}
 
+	var index1, index2, index3, index4, index5, index6 bleve.Index
 	var index bleve.IndexAlias
-
-	if searchIndex == "bcodmo" {
-		index = bleve.NewIndexAlias(index1)
-		log.Println("BCODMO index only")
-	}
-	if searchIndex == "ocd" {
-		index = bleve.NewIndexAlias(index2)
-		log.Println("OCD index only")
-	}
-	if searchIndex == "linkedearth" {
-		index = bleve.NewIndexAlias(index3)
-		log.Println("LinkedEarth index only")
-	} else {
-		index = bleve.NewIndexAlias(index1, index2, index3)
+	if searchIndex == "" {
+		index1, err = openIndex("indexes/bcodmo.bleve")
+		index2, err = openIndex("indexes/ocd.bleve")
+		index3, err = openIndex("indexes/linkedearth.bleve")
+		index4, err = openIndex("indexes/rwg.bleve")
+		index5, err = openIndex("indexes/ieda.bleve")
+		index6, err = openIndex("indexes/csdco.bleve")
+		if err != nil {
+			log.Printf("Error with an index opening: %v", err) // really logged in openIndex
+		}
+		index = bleve.NewIndexAlias(index1, index2, index3, index4, index5, index6)
 		log.Println("All indexes active")
+	} else {
+		index1, err = openIndex(im[searchIndex])
+		if err != nil {
+			log.Printf("Error with an index opening: %v", err)
+		}
+		index = bleve.NewIndexAlias(index1)
+		log.Printf("Active index: %s", im[searchIndex])
 	}
 
-	// Set up query and search
-	// query := bleve.NewMatchQuery(phrase)
+	// Set up query and search.   OLD:  query := bleve.NewMatchQuery(phrase)
 	query := bleve.NewQueryStringQuery(phrase)
 	search := bleve.NewSearchRequestOptions(query, int(numToReturn), int(startPoint), false) // no explanation
-	// search.Highlight = bleve.NewHighlight()                      // need Stored and IncludeTermVectors in index
+	// search.Highlight = bleve.NewHighlight()                      // need Stored and IncludeTermVectors in index ?
 	search.Highlight = bleve.NewHighlightWithStyle("html") // need Stored and IncludeTermVectors in index
 
 	// var jsonResults []byte // will hold our results
@@ -143,6 +144,7 @@ func openIndex(indexPath string) (bleve.Index, error) {
 		var err error
 		bleveIdx, err = bleve.OpenUsing(indexPath, map[string]interface{}{"read_only": true})
 		if err != nil {
+			log.Printf("Error with an index opening: %v", err)
 			return nil, err
 		}
 	}
