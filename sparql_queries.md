@@ -74,7 +74,7 @@ GROUP BY ?service ?url_template ?content_type
 ORDER BY ?service
 ```
 
-<a id="#repository-services-inputs"></a>
+<a id="repository-services-inputs"></a>
 #### Repository Services Query Inputs ####
 
 ```
