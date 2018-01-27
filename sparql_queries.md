@@ -3,7 +3,7 @@
 * [Repository](#repository)
   * [Services](#repository-services)
     * [Target Properties](#repository-services-target)
-    * [Query Inputs](#repository-services-query_input)
+    * [Query Inputs](#repository-services-inputs)
 * [Dataset](#dataset)
   * [Variables](#dataset-variables)
   * [People](#dataset-people)
@@ -18,7 +18,7 @@
 ### Repository Services ###
 
 1. ?action_target_type = "@type" means you've got to query down to check for schema:urlTemplate, schema:contentType, and schema:httpMethod. See [Repository Service Target Properties](#repository-services-target)
-2. ?action_query_input_type = "@type" means you've got to query down for all the input parameters to a search service. See [Repository Service Query Inputs](#repository-services-query_input)
+2. ?action_query_input_type = "@type" means you've got to query down for all the input parameters to a search service. See [Repository Service Query Inputs](#repository-services-inputs)
 
 ```
 PREFIX schema: <http://schema.org/>
@@ -74,7 +74,7 @@ GROUP BY ?service ?url_template ?content_type
 ORDER BY ?service
 ```
 
-<a id="#repository-services-query_input"></a>
+<a id="#repository-services-inputs"></a>
 #### Repository Services Query Inputs ####
 
 ```
