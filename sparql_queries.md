@@ -2,6 +2,7 @@
 ## Table of Contents ##
 * [Repository](#repository)
   * [Services](#repository-services)
+    * [Logo](#repository-logo)
     * [Target Properties](#repository-services-target)
     * [Query Inputs](#repository-services-inputs)
 * [Dataset](#dataset)
@@ -14,6 +15,23 @@
 <a id="repository"></a>
 ## Repository ##
 
+<a id="repository-logo"></a>
+### Repository Logo ###
+
+1. Should discuss what the ```VALUES``` would be here? Could be Graph IRI?
+```
+PREFIX schema: <http://schema.org/>
+SELECT DISTINCT ?graph ?logo
+WHERE {
+  VALUES ?repo {
+    <http://www.bco-dmo.org/affiliation/191>
+  }
+  GRAPH ?graph {
+    ?repo schema:logo [ schema:url ?logo ]
+  }
+}
+ORDER BY ?graph ?logo
+```
 <a id="repository-services"></a>
 ### Repository Services ###
 
