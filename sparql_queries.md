@@ -1,8 +1,8 @@
 <a id="top"></a>
 ## Table of Contents ##
+* [Logo](#resource-logo)
 * [Repository](#repository)
   * [Services](#repository-services)
-    * [Logo](#repository-logo)
     * [Target Properties](#repository-services-target)
     * [Query Inputs](#repository-services-inputs)
 * [Dataset](#dataset)
@@ -13,26 +13,35 @@
   * [Query Inputs](#dataset-search-endpoint)
  
 <hr/>
+
+
+<a id="resource-logo"></a>
+### Resource Logo ###
+
+1. When executing this query, we should probably only specify one ?type.
+```
+PREFIX schema: <http://schema.org/>
+SELECT DISTINCT ?graph ?type ?resource ?logo
+WHERE {
+  VALUES ?resource {
+    <http://www.bco-dmo.org/affiliation/191>
+  }
+  VALUES ?type {
+    schema:Organization
+    schema:Dataset
+  }
+  GRAPH ?graph {
+    ?resource rdf:type ?type .
+    OPTIONAL { ?resource schema:logo [ schema:url ?logo ] }
+    
+  }
+}
+ORDER BY ?graph ?type ?resource ?logo
+```
+
 <a id="repository"></a>
 ## Repository ##
 
-<a id="repository-logo"></a>
-### Repository Logo ###
-
-1. Should discuss what the ```VALUES``` would be here? Could be Graph IRI?
-```
-PREFIX schema: <http://schema.org/>
-SELECT DISTINCT ?graph ?logo
-WHERE {
-  VALUES ?repo {
-    <http://www.bco-dmo.org/affiliation/191>
-  }
-  GRAPH ?graph {
-    ?repo schema:logo [ schema:url ?logo ]
-  }
-}
-ORDER BY ?graph ?logo
-```
 <a id="repository-services"></a>
 ### Repository Services ###
 
