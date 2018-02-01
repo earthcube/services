@@ -15,46 +15,6 @@ type LocType struct {
 	Type string `json:"type"`
 }
 
-// // LocationPoint is a simple type and cooridnates struct for schema.org spatial info
-// type LocationPoint struct {
-// 	Type        string    `json:"type"`
-// 	Coordinates []float64 `json:"coordinates"`
-// }
-
-// // LocationPoly is a simple type and cooridnates struct for schema.org spatial info
-// type LocationPoly struct {
-// 	Type        string        `json:"type"`
-// 	Coordinates [][][]float64 `json:"coordinates"`
-// }
-
-// // LocationFeature is a simple type and cooridnates struct for schema.org spatial info
-// type LocationFeature struct {
-// 	Type     string       `json:"type"`
-// 	Geometry LocationPoly `json:"geometry"`
-// }
-
-// // GeoJOSN struct
-// type GeoJSON struct {
-// 	Type     string        `json:"type"`
-// 	Features []GeoFeatures `json:"features"`
-// }
-
-// // GeoFeatures
-// type GeoFeatures struct {
-// 	Type       string        `json:"type"`
-// 	Properties GeoProperties `json:"properties"`
-// 	Geometry   GeoGeometry   `json:"geometry"`
-// }
-
-// type GeoProperties struct {
-// 	URL string `json:URL`
-// }
-
-// type GeoGeometry struct {
-// 	Type        string    `json:"type"`
-// 	Coordinates []float64 `json:"coordinates"`
-// }
-
 // New builds out the services calls..
 func New() *restful.WebService {
 	service := new(restful.WebService)
@@ -76,7 +36,9 @@ func New() *restful.WebService {
 // SpatialCall calls to tile38 data store
 func SpatialCall(request *restful.Request, response *restful.Response) {
 
-	wktstring := request.QueryParameter("geowithin")
+	geojsonquery := request.QueryParameter("geowithin")
+
+	// TODO   we could validate this geoJSON query string up front to see if it is valid
 
 	// c, err := redis.Dial("tcp", "tile38:9851")
 	c, err := redis.Dial("tcp", "localhost:9851")
@@ -87,8 +49,9 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	var value1 int
 	var value2 []interface{}
-	reply, err := redis.Values(c.Do("INTERSECTS", "p418", "LIMIT", "50000", "OBJECT", wktstring))
-	// reply, err := redis.Values(c.Do("SCAN", "p418"))
+	// TODO  fix the 50K request limit, put in cursor pattern
+	reply, err := redis.Values(c.Do("INTERSECTS", "p418", "LIMIT", "50000", "OBJECT", geojsonquery))
+	// reply, err := redis.Values(c.Do("SCAN", "p418"))  // an early test call just to get everything
 	if err != nil {
 		fmt.Printf("Error in reply %v \n", err)
 	}
@@ -96,13 +59,13 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 		fmt.Printf("Error in scan %v \n", err)
 	}
 
-	fmt.Println(value1)
+	log.Println(value1) // the point of this logging is what?
 
-	results, _ := templateTest(value2)
+	results, _ := redisToGeoJSON(value2)
 	response.Write([]byte(results))
 }
 
-func templateTest(results []interface{}) (string, error) {
+func redisToGeoJSON(results []interface{}) (string, error) {
 
 	fc := geojson.NewFeatureCollection()
 
@@ -130,6 +93,7 @@ func templateTest(results []interface{}) (string, error) {
 
 			switch {
 			case g.IsPoint():
+				log.Printf("Added point for %s\n", val0)
 				nf := geojson.NewFeature(g)
 				nf.SetProperty("URL", val0)
 				fc.AddFeature(nf)
