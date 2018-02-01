@@ -10,6 +10,7 @@
   * [People](#dataset-people)
   * [Funder](#dataset-funder)
   * [Publisher/Provider](#dataset-publisher_provider)
+  * [Query Inputs](#dataset-search-endpoint)
  
 <hr/>
 <a id="repository"></a>
@@ -251,5 +252,28 @@ ORDER BY ?role ?legal_name ?name
 
 ```
 
+<a id="dataset-search-endpoint"></a>
+### Dataset Search Endpoint ###
+
+```
+PREFIX schema: <http://schema.org/>
+SELECT DISTINCT ?dataset ?action ?action_target ?action_query_input
+WHERE
+{
+  VALUES ?dataset
+  {
+    <http://some-uri-here>
+  }
+  ?dataset a schema:Dataset .
+  ?dataset schema:potentialAction ?action .
+  ?action a schema:SearchAction .
+  ?action schema:target ?action_target .
+  ?action schema:query-input ?action_query_input .
+  OPTIONAL {
+    ?action_target schema:urlTemplate ?action_target_url_template .
+  }  
+}
+ORDER BY ?dataset ?action_target
+```
 
 Back to [Top](#top)
