@@ -15,7 +15,7 @@ func New() *restful.WebService {
 	service.
 		Path("/api/v1/graph").
 		Doc("P418 graph driven API calls").
-		Consumes("application/x-www-form-urlencoded").
+		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON) //Consumes(restful.M).
 
 	// add in start point and length cursors
@@ -29,6 +29,7 @@ func New() *restful.WebService {
 		Doc("Call for details on an array of resources from the triplestore (graph)").
 		Param(service.BodyParameter("body", "The body containing an array of URIs to obtain parameter values from")).
 		Writes([]ResourceResults{}).
+		Consumes("application/x-www-form-urlencoded").
 		Operation("ResourceSetCall"))
 
 	service.Route(service.POST("/ressetpeople").To(ResourceSetPeopleCall).
