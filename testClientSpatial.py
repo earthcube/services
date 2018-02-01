@@ -50,7 +50,8 @@ data='''{
 }
 '''
 
-PARAMS = {'geowithin':data}
+# PARAMS = {'geowithin':data}
+PARAMS = {'geowithin':data, 'filter':"linked"}
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)
 # display(r.content)  # calls to geojson.io and opens your browser to view it..  

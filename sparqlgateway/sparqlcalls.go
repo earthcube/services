@@ -17,46 +17,14 @@ type ResourceResults struct {
 	PubURL  string
 }
 
-const queries = `
-# Comments are ignored, except those tagging a query.
-
-# tag: ResourceResults
-prefix schema: <http://schema.org/>
-SELECT ?val ?desc ?pubname ?puburl
-WHERE
-{
-  BIND(<{{.RESID}}> AS ?ID)
-  ?ID schema:publisher ?pub .
-  ?pub schema:name ?pubname .
-  ?pub schema:url ?puburl .
-  ?ID schema:variableMeasured ?res  .
-  ?res a schema:PropertyValue .
-  ?res schema:value ?val   .
-  ?res schema:description ?desc     
-} 
-
-# tag: ResourceSetResults
-prefix schema: <http://schema.org/>
-SELECT DISTINCT ?val ?desc ?pubname ?puburl
-WHERE
-{
-VALUES ?ID
-{  {{.}}
+type ResourceSetPeople struct {
+	G        string
+	Person   string
+	Rolename string
+	Name     string
+	URL      string
+	Orcid    string
 }
-?ID schema:variableMeasured ?res .
-OPTIONAL {
-?res a schema:PropertyValue .
-?res schema:value ?val .
-?res schema:description ?desc
-}
-OPTIONAL {
-?ID schema:publisher ?pub .
-OPTIONAL { ?pub schema:name ?pubname }
-OPTIONAL { ?pub schema:url ?puburl }
-}
-}
-
-`
 
 func getP418SPARQL() (*sparql.Repo, error) {
 	repo, err := sparql.NewRepo("http://geodex.org/blazegraph/namespace/p418/sparql",
@@ -66,6 +34,39 @@ func getP418SPARQL() (*sparql.Repo, error) {
 		log.Printf("%s\n", err)
 	}
 	return repo, err
+}
+
+// ResSetPeople takes a single resource and returns the variable measured property value
+func ResSetPeople(resources URLSet) []ResourceSetPeople {
+	repo, err := getP418SPARQL()
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	f := bytes.NewBufferString(queries)
+	bank := sparql.LoadBank(f)
+
+	q, err := bank.Prepare("ResourceSetPeople", strings.Join(resources, " "))
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	log.Printf("SPARQL: %s\n", q)
+
+	res, err := repo.Query(q)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	rra := []ResourceSetPeople{}
+	bindings := res.Results.Bindings // map[string][]rdf.Term
+	for _, i := range bindings {
+		rr := ResourceSetPeople{G: i["g"].Value, Person: i["person"].Value, Rolename: i["rolename"].
+			Value, Name: i["name"].Value, URL: i["url"].Value, Orcid: i["orcid"].Value}
+		rra = append(rra, rr)
+	}
+
+	return rra
 }
 
 // ResSetCall takes a single resource and returns the variable measured property value

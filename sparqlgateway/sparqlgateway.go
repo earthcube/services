@@ -31,6 +31,12 @@ func New() *restful.WebService {
 		Writes([]ResourceResults{}).
 		Operation("ResourceSetCall"))
 
+	service.Route(service.POST("/ressetpeople").To(ResourceSetPeopleCall).
+		Doc("Call for people associated with an array of resources from the triplestore (graph)").
+		Param(service.BodyParameter("body", "The body containing an array of URIs to obtain people relation values from")).
+		Writes([]ResourceSetPeople{}).
+		Operation("ResourceSetPeopleCall"))
+
 	return service
 }
 
@@ -45,23 +51,37 @@ func ResourceCall(request *restful.Request, response *restful.Response) {
 // ResourceSetCall call for details on the resource array from the graph
 func ResourceSetCall(request *restful.Request, response *restful.Response) {
 
-	log.Println("Get request body")
 	body, err := request.BodyParameter("body")
 	if err != nil {
 		log.Printf("Error on body parameter read %v \n", err)
 	}
-	log.Println(body)
 
-	// ja := []byte(`["<https://www.bco-dmo.org/dataset/3300>", "<http://opencoredata.org/id/dataset/bcd15975-680c-47db-a062-ac0bb6e66816>"]`)
 	ja := []byte(body)
-
 	var jas URLSet
-
 	err = json.Unmarshal(ja, &jas)
 	if err != nil {
 		log.Println("error with unmarshal..   return http error")
 	}
 
 	sr := ResSetCall(jas)
+	response.WriteEntity(sr)
+}
+
+// ResourceSetPeopleCall call for details on the resource array from the graph
+func ResourceSetPeopleCall(request *restful.Request, response *restful.Response) {
+
+	body, err := request.BodyParameter("body")
+	if err != nil {
+		log.Printf("Error on body parameter read %v \n", err)
+	}
+
+	ja := []byte(body)
+	var jas URLSet
+	err = json.Unmarshal(ja, &jas)
+	if err != nil {
+		log.Println("error with unmarshal..   return http error")
+	}
+
+	sr := ResSetPeople(jas)
 	response.WriteEntity(sr)
 }
