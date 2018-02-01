@@ -1,8 +1,8 @@
 <a id="top"></a>
 ## Table of Contents ##
+* [Logo](#resource-logo)
 * [Repository](#repository)
   * [Services](#repository-services)
-    * [Logo](#repository-logo)
     * [Target Properties](#repository-services-target)
     * [Query Inputs](#repository-services-inputs)
 * [Dataset](#dataset)
@@ -10,28 +10,38 @@
   * [People](#dataset-people)
   * [Funder](#dataset-funder)
   * [Publisher/Provider](#dataset-publisher_provider)
+  * [Query Inputs](#dataset-search-endpoint)
  
 <hr/>
+
+
+<a id="resource-logo"></a>
+### Resource Logo ###
+
+1. When executing this query, we should probably only specify one ?type.
+```
+PREFIX schema: <http://schema.org/>
+SELECT DISTINCT ?graph ?type ?resource ?logo
+WHERE {
+  VALUES ?resource {
+    <http://www.bco-dmo.org/affiliation/191>
+  }
+  VALUES ?type {
+    schema:Organization
+    schema:Dataset
+  }
+  GRAPH ?graph {
+    ?resource rdf:type ?type .
+    OPTIONAL { ?resource schema:logo [ schema:url ?logo ] }
+    
+  }
+}
+ORDER BY ?graph ?type ?resource ?logo
+```
+
 <a id="repository"></a>
 ## Repository ##
 
-<a id="repository-logo"></a>
-### Repository Logo ###
-
-1. Should discuss what the ```VALUES``` would be here? Could be Graph IRI?
-```
-PREFIX schema: <http://schema.org/>
-SELECT DISTINCT ?graph ?logo
-WHERE {
-  VALUES ?repo {
-    <http://www.bco-dmo.org/affiliation/191>
-  }
-  GRAPH ?graph {
-    ?repo schema:logo [ schema:url ?logo ]
-  }
-}
-ORDER BY ?graph ?logo
-```
 <a id="repository-services"></a>
 ### Repository Services ###
 
@@ -251,5 +261,28 @@ ORDER BY ?role ?legal_name ?name
 
 ```
 
+<a id="dataset-search-endpoint"></a>
+### Dataset Search Endpoint ###
+
+```
+PREFIX schema: <http://schema.org/>
+SELECT DISTINCT ?dataset ?action ?action_target ?action_query_input
+WHERE
+{
+  VALUES ?dataset
+  {
+    <http://some-uri-here>
+  }
+  ?dataset a schema:Dataset .
+  ?dataset schema:potentialAction ?action .
+  ?action a schema:SearchAction .
+  ?action schema:target ?action_target .
+  ?action schema:query-input ?action_query_input .
+  OPTIONAL {
+    ?action_target schema:urlTemplate ?action_target_url_template .
+  }  
+}
+ORDER BY ?dataset ?action_target
+```
 
 Back to [Top](#top)
