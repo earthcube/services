@@ -36,6 +36,7 @@ func New() *restful.WebService {
 		Doc("Call for people associated with an array of resources from the triplestore (graph)").
 		Param(service.BodyParameter("body", "The body containing an array of URIs to obtain people relation values from")).
 		Writes([]ResourceSetPeople{}).
+		Consumes("application/x-www-form-urlencoded").
 		Operation("ResourceSetPeopleCall"))
 
 	return service

@@ -17,6 +17,7 @@ type LocType struct {
 	Type string `json:"type"`
 }
 
+// URLSet is a simple string array of URLs to be worked on
 type URLSet []string
 
 // New builds out the services calls..

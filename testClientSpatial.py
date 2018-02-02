@@ -1,8 +1,8 @@
 from geojsonio import display
 import requests
 
-URL = 'http://localhost:6789/api/v1/spatial/search/test1'
-# URL = 'http://geodex.org/api/v1/spatial/search/test1'
+# URL = 'http://localhost:6789/api/v1/spatial/search/object'
+URL = 'http://geodex.org/api/v1/spatial/search/object'
 
 # http://get.iedadata.org/doi/315201  
 # {"type":"Polygon","coordinates":[[[-16.91266,28.11008],[-16.91266,33.31179],[-9.24511,33.31179],[-9.24511,28.11008],[-16.91266,28.11008]]]}
@@ -53,4 +53,4 @@ data='''{
 PARAMS = {'geowithin':data, 'filter':"bco-dmo"}
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)
-# display(r.content)  # calls to geojson.io and opens your browser to view it..  
+display(r.content)  # calls to geojson.io and opens your browser to view it..  
