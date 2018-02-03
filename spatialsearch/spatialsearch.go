@@ -54,8 +54,8 @@ func New() *restful.WebService {
 }
 
 func redisDial() (redis.Conn, error) {
-	// c, err := redis.Dial("tcp", "tile38:9851")
-	c, err := redis.Dial("tcp", "localhost:9851")
+	c, err := redis.Dial("tcp", "tile38:9851")
+	// c, err := redis.Dial("tcp", "localhost:9851")
 	if err != nil {
 		log.Printf("Could not connect: %v\n", err)
 	}
