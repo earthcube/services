@@ -208,6 +208,7 @@ WHERE
 
 ```
 PREFIX schema: <http://schema.org/>
+PREFIX gdx: <https://geodex.org/voc/>
 SELECT DISTINCT ?g ?funder ?legal_name ?name ?url ?award ?award_name ?award_url
 WHERE
 {
@@ -225,6 +226,7 @@ WHERE
     OPTIONAL { ?funder schema:url ?url }
     OPTIONAL { 
       ?funder schema:makesOffer ?award .
+      ?dataset gdx:fundedBy ?award .
       ?award schema:additionalType "geolink:Award" .
       ?award schema:name ?award_name .
       OPTIONAL { ?award schema:url ?award_url }
