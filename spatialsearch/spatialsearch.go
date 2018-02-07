@@ -20,6 +20,15 @@ type LocType struct {
 // URLSet is a simple string array of URLs to be worked on
 type URLSet []string
 
+func redisDial() (redis.Conn, error) {
+	// c, err := redis.Dial("tcp", "tile38:9851")
+	c, err := redis.Dial("tcp", "localhost:9851")
+	if err != nil {
+		log.Printf("Could not connect: %v\n", err)
+	}
+	return c, err
+}
+
 // New builds out the services calls..
 func New() *restful.WebService {
 	service := new(restful.WebService)
@@ -53,15 +62,6 @@ func New() *restful.WebService {
 	return service
 }
 
-func redisDial() (redis.Conn, error) {
-	c, err := redis.Dial("tcp", "tile38:9851")
-	// c, err := redis.Dial("tcp", "localhost:9851")
-	if err != nil {
-		log.Printf("Could not connect: %v\n", err)
-	}
-	return c, err
-}
-
 // ResSetCall return the GeoJSON of a set of resources
 func ResSetCall(request *restful.Request, response *restful.Response) {
 	body, err := request.BodyParameter("body")
@@ -88,12 +88,18 @@ func ResSetCall(request *restful.Request, response *restful.Response) {
 		log.Printf("Going to get geo for %s \n", uri)
 		reply, err := redis.String(c.Do("GET", "p418", uri)) // an early test call just to get everything
 		if err != nil {
-			fmt.Printf("Error in reply %v \n", err)
+			fmt.Printf("Error in reply for %s : %v \n", uri, err)
+		} else {
+			m[uri] = reply
 		}
-		m[uri] = reply
 	}
 
-	results, _ := redisStringToGeoJSON(m)
+	results, err := redisStringToGeoJSON(m)
+	if err != nil {
+		log.Println(err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
 	response.Write([]byte(results))
 }
 
@@ -112,7 +118,12 @@ func ResCall(request *restful.Request, response *restful.Response) {
 
 	m := make(map[string]string)
 	m[resid] = reply
-	results, _ := redisStringToGeoJSON(m)
+	results, err := redisStringToGeoJSON(m)
+	if err != nil {
+		log.Println(err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
 	response.Write([]byte(results))
 }
 
@@ -144,7 +155,12 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	log.Println(value1) // the point of this logging is what?
 
-	results, _ := redisToGeoJSON(value2, filter)
+	results, err := redisToGeoJSON(value2, filter)
+	if err != nil {
+		log.Println(err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
 	response.Write([]byte(results))
 }
 

@@ -3,6 +3,7 @@ package sparqlgateway
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 
 	restful "github.com/emicklei/go-restful"
 )
@@ -56,6 +57,9 @@ func ResourceSetCall(request *restful.Request, response *restful.Response) {
 	body, err := request.BodyParameter("body")
 	if err != nil {
 		log.Printf("Error on body parameter read %v \n", err)
+		log.Println(err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
 	}
 
 	ja := []byte(body)
@@ -63,6 +67,9 @@ func ResourceSetCall(request *restful.Request, response *restful.Response) {
 	err = json.Unmarshal(ja, &jas)
 	if err != nil {
 		log.Println("error with unmarshal..   return http error")
+		log.Println(err)
+		response.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	sr := ResSetCall(jas)
@@ -75,6 +82,9 @@ func ResourceSetPeopleCall(request *restful.Request, response *restful.Response)
 	body, err := request.BodyParameter("body")
 	if err != nil {
 		log.Printf("Error on body parameter read %v \n", err)
+		log.Println(err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
 	}
 
 	ja := []byte(body)
@@ -82,6 +92,9 @@ func ResourceSetPeopleCall(request *restful.Request, response *restful.Response)
 	err = json.Unmarshal(ja, &jas)
 	if err != nil {
 		log.Println("error with unmarshal..   return http error")
+		log.Println(err)
+		response.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	sr := ResSetPeople(jas)

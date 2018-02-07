@@ -238,7 +238,7 @@ func maxFloat(ora []OrganicResults) (float64, error) {
 	return m, err
 }
 
-// Some sort logic to return orsa in a sorted order
+// Len, Swap, Less: Some sort logic to return orsa in a sorted order
 func (s byScore) Len() int {
 	return len(s)
 }
