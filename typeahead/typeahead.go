@@ -10,6 +10,7 @@ import (
 type Provider struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	IndexName   string `json:"index"`
 }
 
 // New builds out the services calls for type ahead
@@ -40,17 +41,26 @@ func ProvidersCall(request *restful.Request, response *restful.Response) {
 
 	pa := []Provider{}
 
-	ocd := Provider{Name: "OpenCore", Description: "Core data services site"}
+	ocd := Provider{Name: "OpenCore", Description: "Open Core Data", IndexName: "ocd"}
 	pa = append(pa, ocd)
 
-	bcodmo := Provider{Name: "BCO-DMO", Description: "Big long BCO-DMO name"}
+	bcodmo := Provider{Name: "BCO-DMO", Description: "Biological and Chemical Oceanography Data Management Office", IndexName: "bcodmo"}
 	pa = append(pa, bcodmo)
 
-	le := Provider{Name: "LinkedEarth", Description: "EARTHCUBE Linked Earth"}
+	le := Provider{Name: "LinkedEarth", Description: "EARTHCUBE Linked Earth Building Block", IndexName: "linkedearth"}
 	pa = append(pa, le)
 
-	neotoma := Provider{Name: "Neotoma", Description: "Neotoma"}
-	pa = append(pa, neotoma)
+	// neotoma := Provider{Name: "Neotoma", Description: "Neotoma", IndexName: "neotoma"}
+	// pa = append(pa, neotoma)
+
+	ieda := Provider{Name: "IEDA", Description: "Interdisciplinary Earth Data Alliance ", IndexName: "ieda"}
+	pa = append(pa, ieda)
+
+	rwg := Provider{Name: "EarthCube RWG", Description: "EarthCube Council of Data Facilities Registry Working Group", IndexName: "rwg"}
+	pa = append(pa, rwg)
+
+	csdco := Provider{Name: "CSDCO", Description: "Neotoma", IndexName: "csdco"}
+	pa = append(pa, csdco)
 
 	data, _ := json.Marshal(pa)
 
