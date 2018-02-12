@@ -22,24 +22,24 @@ data='''{
         "coordinates": [
           [
             [
-              -81.5625,
-              14.944784875088372
+              -95.97656249999999,
+              23.241346102386135
             ],
             [
-              -5.9765625,
-              14.944784875088372
+              -88.24218749999999,
+              23.241346102386135
             ],
             [
-              -5.9765625,
-              39.36827914916014
+              -88.24218749999999,
+              29.53522956294847
             ],
             [
-              -81.5625,
-              39.36827914916014
+              -95.97656249999999,
+              29.53522956294847
             ],
             [
-              -81.5625,
-              14.944784875088372
+              -95.97656249999999,
+              23.241346102386135
             ]
           ]
         ]
@@ -53,4 +53,4 @@ data='''{
 PARAMS = {'geowithin':data, 'filter':"bco-dmo"}
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)
-display(r.content)  # calls to geojson.io and opens your browser to view it..  
+# display(r.content)  # calls to geojson.io and opens your browser to view it..  
