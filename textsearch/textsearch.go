@@ -34,7 +34,7 @@ func New() *restful.WebService {
 	service := new(restful.WebService)
 	service.
 		Path("/api/v1/textindex").
-		Doc("P418 text search API").
+		Doc("Organic free text search services").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
@@ -66,13 +66,20 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 	log.Printf("Search Term: %s \n", phrase)
 	startPoint, err := strconv.ParseInt(request.QueryParameter("s"), 10, 32)
 	if err != nil {
-		log.Printf("Error with index1 alias: %v", err)
+		log.Printf("Error with starting index value: %v", err)
 		response.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 	numToReturn, err := strconv.ParseInt(request.QueryParameter("n"), 10, 32)
 	if err != nil {
-		log.Printf("Error with index1 alias: %v", err)
+		log.Printf("Error with number requested value: %v", err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Neither of the index or number requested can be less than 1
+	if numToReturn < 1 || startPoint < 1 {
+		log.Printf("Requested index or return value of 0 or negative: %v", err)
 		response.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}

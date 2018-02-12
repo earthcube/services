@@ -21,8 +21,8 @@ type LocType struct {
 type URLSet []string
 
 func redisDial() (redis.Conn, error) {
-	// c, err := redis.Dial("tcp", "tile38:9851")
-	c, err := redis.Dial("tcp", "localhost:9851")
+	c, err := redis.Dial("tcp", "tile38:9851")
+	// c, err := redis.Dial("tcp", "localhost:9851")
 	if err != nil {
 		log.Printf("Could not connect: %v\n", err)
 	}
@@ -35,27 +35,30 @@ func New() *restful.WebService {
 
 	service.
 		Path("/api/v1/spatial").
-		Doc("Spatial services to P418 holdings").
+		Doc("Spatial services").
 		Consumes(restful.MIME_JSON).
-		Produces(restful.MIME_JSON)
+		Produces("application/vnd.geo+json")
 
 	service.Route(service.GET("/search/object").To(SpatialCall).
-		Doc("get expeditions from a spatial polygon defined by wkt").
+		Doc("get expeditions from a spatial polygon defined by geojson").
 		Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
 		Param(service.QueryParameter("filter", "Filter the URL property in the GeoJSON for the pattern in this parameter if present ").DataType("string")).
 		ReturnsError(400, "Unable to handle request", nil).
+		Produces("application/vnd.geo+json").
 		Operation("SpatialCall"))
 
 	service.Route(service.GET("/search/resource").To(ResCall).
-		Doc("get expeditions from a spatial polygon defined by wkt").
+		Doc("get expeditions from a spatial polygon defined by geojson").
 		Param(service.QueryParameter("id", "ID of the resource to locate").DataType("string")).
 		ReturnsError(400, "Unable to handle request", nil).
+		Produces("application/vnd.geo+json").
 		Operation("ResCall"))
 
 	service.Route(service.POST("/search/resourceset").To(ResSetCall).
 		Doc("Call for details on an array of resources from the triplestore (graph)").
 		Param(service.BodyParameter("body", "The body containing an array of URIs to obtain parameter values from")).
 		Consumes("application/x-www-form-urlencoded").
+		Produces("application/vnd.geo+json").
 		ReturnsError(400, "Unable to handle request", nil).
 		Operation("ResSetCall"))
 
@@ -114,6 +117,10 @@ func ResCall(request *restful.Request, response *restful.Response) {
 	reply, err := redis.String(c.Do("GET", "p418", resid)) // an early test call just to get everything
 	if err != nil {
 		fmt.Printf("Error in reply %v \n", err)
+		log.Println(err)
+		// response.WriteHeader(http.StatusUnprocessableEntity)
+		response.WriteErrorString(422, "This may not be a valid resources in our index")
+		return
 	}
 
 	m := make(map[string]string)

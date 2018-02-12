@@ -18,13 +18,14 @@ func New() *restful.WebService {
 
 	service.
 		Path("/api/v1/typeahead").
-		Doc("Spatial services to P418 holdings").
+		Doc("Typeahead services to support user interfaces").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
 	service.Route(service.GET("/providers").To(ProvidersCall).
-		Doc("Get list of providers for typeahead query to support UI typeahead").
+		Doc("Get list of providers for typeahead query to support query box typeahead").
 		ReturnsError(400, "Unable to handle request", nil).
+		Writes(Provider{}).
 		Operation("ProvidersCall"))
 	return service
 }

@@ -15,7 +15,7 @@ func New() *restful.WebService {
 	service := new(restful.WebService)
 	service.
 		Path("/api/v1/graph").
-		Doc("P418 graph driven API calls").
+		Doc("Graph query services").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON) //Consumes(restful.M).
 
