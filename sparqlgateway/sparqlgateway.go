@@ -26,6 +26,12 @@ func New() *restful.WebService {
 		Writes([]ResourceResults{}).
 		Operation("ResourceCall"))
 
+	service.Route(service.GET("/logo").To(Logo).
+		Doc("Call for logo URL on a resource from the triplestore (graph)").
+		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
+		Writes([]LogoResults{}).
+		Operation("Logo"))
+
 	service.Route(service.POST("/ressetdetails").To(ResourceSetCall).
 		Doc("Call for details on an array of resources from the triplestore (graph)").
 		Param(service.BodyParameter("body", "The body containing an array of URIs to obtain parameter values from")).
@@ -41,6 +47,14 @@ func New() *restful.WebService {
 		Operation("ResourceSetPeopleCall"))
 
 	return service
+}
+
+// Logo call for details on the resource from the graph
+func Logo(request *restful.Request, response *restful.Response) {
+	resource := request.QueryParameter("r")
+
+	sr := LogoCall(resource)
+	response.WriteEntity(sr)
 }
 
 // ResourceCall call for details on the resource from the graph

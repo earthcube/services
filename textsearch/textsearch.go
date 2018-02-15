@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/blevesearch/bleve"
 	restful "github.com/emicklei/go-restful"
@@ -14,17 +15,17 @@ import (
 
 // OrganicResultsSet has top N results from each provider with scores
 type OrganicResultsSet struct {
-	OR        []OrganicResults // provider:results
-	HighScore float64          // provider:highestScore
-	Name      string           // ordered string array based on score
+	OR        []OrganicResults `json:"or"`        // provider:results
+	HighScore float64          `json:"highscore"` // provider:highestScore
+	Index     string           `json:"index"`     // ordered string array based on score
 }
 
 // OrganicResults is a place holder struct
 type OrganicResults struct {
-	Position int
-	Index    string
-	Score    float64
-	ID       string
+	Position  int     `json:"position"`
+	IndexPath string  `json:"indexpath"`
+	Score     float64 `json:"score"`
+	ID        string  `json:"URL"`
 }
 
 type byScore []OrganicResultsSet // for our custom sorting of orsa
@@ -44,7 +45,7 @@ func New() *restful.WebService {
 		Param(service.QueryParameter("q", "Query string").DataType("string")).
 		Param(service.QueryParameter("s", "Starting cursor point").DataType("int")).
 		Param(service.QueryParameter("n", "Number of results to return").DataType("int")).
-		Param(service.QueryParameter("i", "Index to use.  Currently one of; ocd, bcodmo, linkedearth").DataType("string")).
+		Param(service.QueryParameter("i", "Index to use.  Currently 1 or more (comma sparated) of: ocd, bcodmo, ieda, neotoma, rwg, linkedearth").DataType("string")).
 		Writes([]OrganicResults{}).
 		Operation("SearchCall"))
 
@@ -64,12 +65,14 @@ func New() *restful.WebService {
 func SearchCall(request *restful.Request, response *restful.Response) {
 	phrase := request.QueryParameter("q")
 	log.Printf("Search Term: %s \n", phrase)
+
 	startPoint, err := strconv.ParseInt(request.QueryParameter("s"), 10, 32)
 	if err != nil {
 		log.Printf("Error with starting index value: %v", err)
 		response.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
+
 	numToReturn, err := strconv.ParseInt(request.QueryParameter("n"), 10, 32)
 	if err != nil {
 		log.Printf("Error with number requested value: %v", err)
@@ -78,7 +81,7 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 	}
 
 	// Neither of the index or number requested can be less than 1
-	if numToReturn < 1 || startPoint < 1 {
+	if numToReturn < 1 || startPoint < 0 {
 		log.Printf("Requested index or return value of 0 or negative: %v", err)
 		response.WriteHeader(http.StatusUnprocessableEntity)
 		return
@@ -86,19 +89,43 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 
 	im := indexMap() // index maps  (TODO later build from a config file, so not hard coded)
 
+	// get the request index string "i" and parse it to an array
 	searchIndex := "" // use all indexes for testing now...
 	searchIndex = request.QueryParameter("i")
+
+	// Pull and parse the string array
+	var sia []string
 	if searchIndex != "" {
-		if val, ok := im[searchIndex]; !ok {
-			log.Printf("Requested unknown index %s, %s", searchIndex, val)
-			response.WriteHeader(http.StatusUnprocessableEntity)
-			return
+		sia = strings.Split(searchIndex, ",")
+		if len(sia) > 0 {
+			for index := range sia {
+				indexname := sia[index] // get an element from the array, then check it..
+				if val, ok := im[indexname]; !ok {
+					log.Printf("Requested unknown index %s, %s", searchIndex, val)
+					response.WriteHeader(http.StatusUnprocessableEntity)
+					return
+				}
+			}
 		}
 	}
 
-	index := getIndexAlias(searchIndex, im) // we have our index
-	ora := getResultSet(index, phrase, numToReturn, startPoint)
+	if len(sia) == 0 {
+		log.Printf("We seem to have no index set..   SO use them all!  :)   ")
+		im := indexMap() // index maps  (TODO later build from a config file, so not hard coded)
+		for name := range im {
+			sia = append(sia, name) // just put in the name, not the path..  I look that up later   (this could be written better!)
+		}
+	}
 
+	log.Println(sia)
+
+	index, err := getMultiIndexAlias(sia, im) // we have our index
+	if err != nil {
+		response.WriteErrorString(422, "Error getting a set of indexes to search on.  (getMultiIndexalias)")
+		return
+	}
+
+	ora := getResultSet(index, phrase, numToReturn, startPoint)
 	response.WriteEntity(ora)
 }
 
@@ -106,12 +133,14 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 func SearchSetCall(request *restful.Request, response *restful.Response) {
 	phrase := request.QueryParameter("q")
 	log.Printf("Search Term: %s \n", phrase)
+
 	startPoint, err := strconv.ParseInt(request.QueryParameter("s"), 10, 32)
 	if err != nil {
-		log.Printf("Error with index1 alias: %v", err)
+		log.Printf("Error with index alias: %v", err)
 		response.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
+
 	numToReturn, err := strconv.ParseInt(request.QueryParameter("n"), 10, 32)
 	if err != nil {
 		log.Printf("Error with index1 alias: %v", err)
@@ -122,13 +151,16 @@ func SearchSetCall(request *restful.Request, response *restful.Response) {
 	var orsa []OrganicResultsSet
 
 	im := indexMap() // index maps  (TODO later build from a config file, so not hard coded)
-	for k := range im {
-		name := k
-		index := getIndexAlias(name, im) // we have our index
+	for name := range im {
+		index, err := getMultiIndexAlias([]string{name}, im) // we have our index
+		if err != nil {
+			response.WriteErrorString(422, "Error getting a index to search on.  (getMultiIndexalias)")
+			return
+		}
 		ora := getResultSet(index, phrase, numToReturn, startPoint)
 		score, err := maxFloat(ora) // set to highest score in ora..  deal with future error func return
 		if err == nil {
-			ors := OrganicResultsSet{OR: ora, HighScore: score, Name: name}
+			ors := OrganicResultsSet{OR: ora, HighScore: score, Index: name}
 			orsa = append(orsa, ors)
 		}
 	}
@@ -161,37 +193,56 @@ func indexMap() map[string]string {
 	im["rwg"] = "indexes/rwg.bleve"
 	im["ieda"] = "indexes/ieda.bleve"
 	im["csdco"] = "indexes/csdco.bleve"
+	im["neotoma"] = "indexes/neotoma.bleve"
 
 	return im
 }
 
-func getIndexAlias(searchIndex string, im map[string]string) bleve.IndexAlias {
-	var index1, index2, index3, index4, index5, index6 bleve.Index
+// ref: http://www.blevesearch.com/docs/IndexAlias/
+func getMultiIndexAlias(searchIndex []string, im map[string]string) (bleve.IndexAlias, error) {
+	ia := make([]bleve.Index, 0)
 	var err error
-	var index bleve.IndexAlias
-	if searchIndex == "" {
-		index1, err = openIndex("indexes/bcodmo.bleve")
-		index2, err = openIndex("indexes/ocd.bleve")
-		index3, err = openIndex("indexes/linkedearth.bleve")
-		index4, err = openIndex("indexes/rwg.bleve")
-		index5, err = openIndex("indexes/ieda.bleve")
-		index6, err = openIndex("indexes/csdco.bleve")
+
+	for i := range searchIndex {
+		index, err := openIndex(im[searchIndex[i]])
 		if err != nil {
 			log.Printf("Error with an index opening: %v", err) // really logged in openIndex
+			return nil, err
 		}
-		index = bleve.NewIndexAlias(index1, index2, index3, index4, index5, index6)
-		log.Println("All indexes active")
-	} else {
-		index1, err := openIndex(im[searchIndex])
-		if err != nil {
-			log.Printf("Error with an index opening: %v", err)
-		}
-		index = bleve.NewIndexAlias(index1)
-		log.Printf("Active index: %s", im[searchIndex])
+		ia = append(ia, index)
 	}
+	index := bleve.NewIndexAlias(ia...) // use variadic call
 
-	return index
+	return index, err
 }
+
+// func getIndexAlias(searchIndex string, im map[string]string) bleve.IndexAlias {
+// 	var index1, index2, index3, index4, index5, index6 bleve.Index
+// 	var err error
+// 	var index bleve.IndexAlias
+// 	if searchIndex == "" {
+// 		index1, err = openIndex("indexes/bcodmo.bleve")
+// 		index2, err = openIndex("indexes/ocd.bleve")
+// 		index3, err = openIndex("indexes/linkedearth.bleve")
+// 		index4, err = openIndex("indexes/rwg.bleve")
+// 		index5, err = openIndex("indexes/ieda.bleve")
+// 		index6, err = openIndex("indexes/csdco.bleve")
+// 		if err != nil {
+// 			log.Printf("Error with an index opening: %v", err) // really logged in openIndex
+// 		}
+// 		index = bleve.NewIndexAlias(index1, index2, index3, index4, index5, index6)
+// 		log.Println("All indexes active")
+// 	} else {
+// 		index1, err := openIndex(im[searchIndex])
+// 		if err != nil {
+// 			log.Printf("Error with an index opening: %v", err)
+// 		}
+// 		index = bleve.NewIndexAlias(index1)
+// 		log.Printf("Active index: %s", im[searchIndex])
+// 	}
+
+// 	return index
+// }
 
 func getResultSet(index bleve.IndexAlias, phrase string, numToReturn, startPoint int64) []OrganicResults {
 
@@ -217,7 +268,7 @@ func getResultSet(index bleve.IndexAlias, phrase string, numToReturn, startPoint
 
 		// testing print loop
 		for k, item := range hits {
-			ors := OrganicResults{Position: k, Index: item.Index, Score: item.Score, ID: item.ID}
+			ors := OrganicResults{Position: k, IndexPath: item.Index, Score: item.Score, ID: item.ID}
 			ora = append(ora, ors)
 			fmt.Printf("\n%d: %s, %f, %s, %v\n", k, item.Index, item.Score, item.ID, item.Fragments)
 			for key, frag := range item.Fragments {

@@ -3,6 +3,26 @@ package sparqlgateway
 const queries = `
 # Comments are ignored, except those tagging a query.
 
+# tag: LogoCall
+PREFIX schema: <http://schema.org/>
+SELECT DISTINCT ?graph ?type ?resource ?logo
+WHERE {
+  VALUES ?resource {
+    <{{.RESID}}>
+  }
+  VALUES ?type {
+    schema:Organization
+    schema:Dataset
+  }
+  GRAPH ?graph {
+    ?resource rdf:type ?type .
+    OPTIONAL { ?resource schema:logo [ schema:url ?logo ] }
+    
+  }
+}
+ORDER BY ?graph ?type ?resource ?logo
+
+
 # tag: ResourceResults
 prefix schema: <http://schema.org/>
 SELECT ?val ?desc ?pubname ?puburl
