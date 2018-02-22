@@ -31,6 +31,7 @@ func main() {
 	wsContainer.Add(spatialsearch.New()) // spatial services
 	wsContainer.Add(typeahead.New())     // typeahead services
 	wsContainer.Add(sparqlgateway.New()) // graph services
+	wsContainer.Add(sparqlgateway.Dev()) // DEV graph services
 	// wsContainer.Add(graphsearch.New())  // text graph services
 
 	// Swagger
