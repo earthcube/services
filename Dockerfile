@@ -1,5 +1,7 @@
 # Start from scratch image and add in a precompiled binary
+# Cross compile if needed...
 # CGO_ENABLED=0 env GOOS=linux go build .
+# CGO_ENABLED=0 go build .
 # docker build -t earthcube/p418services:latest -t earthcube/p418services:0.0.1 .
 # docker run -d -p 6789:6789  earthcube/p418services:0.0.1
 FROM scratch

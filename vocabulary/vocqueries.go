@@ -3,7 +3,6 @@ package vocabulary
 import (
 	"bytes"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/knakk/sparql"
@@ -45,6 +44,12 @@ const queries = `
 
 `
 
+// VocList is a struct holding the name and URL for a vocabulary
+type VocList struct {
+	Name string
+	URL  string
+}
+
 func getP418SPARQL() (*sparql.Repo, error) {
 	repo, err := sparql.NewRepo("http://geodex.org/blazegraph/namespace/p418/sparql",
 		sparql.Timeout(time.Millisecond*15000),
@@ -56,7 +61,7 @@ func getP418SPARQL() (*sparql.Repo, error) {
 }
 
 // List gets a list of all unique vocabularies (or parameters) in the graph
-func List(resources URLSet) []ResourceSetPeople {
+func List() []VocList {
 	repo, err := getP418SPARQL()
 	if err != nil {
 		log.Printf("%s\n", err)
@@ -65,7 +70,7 @@ func List(resources URLSet) []ResourceSetPeople {
 	f := bytes.NewBufferString(queries)
 	bank := sparql.LoadBank(f)
 
-	q, err := bank.Prepare("ListVoc", strings.Join(resources, " "))
+	q, err := bank.Prepare("ListVoc")
 	if err != nil {
 		log.Printf("%s\n", err)
 	}
@@ -77,13 +82,12 @@ func List(resources URLSet) []ResourceSetPeople {
 		log.Printf("%s\n", err)
 	}
 
-	rra := []ResourceSetPeople{}
+	vla := []VocList{}
 	bindings := res.Results.Bindings // map[string][]rdf.Term
 	for _, i := range bindings {
-		rr := ResourceSetPeople{G: i["g"].Value, Person: i["person"].Value, Rolename: i["rolename"].
-			Value, Name: i["name"].Value, URL: i["url"].Value, Orcid: i["orcid"].Value}
-		rra = append(rra, rr)
+		rr := VocList{Name: i["g"].Value, URL: i["person"].Value}
+		vla = append(vla, rr)
 	}
 
-	return rra
+	return vla
 }

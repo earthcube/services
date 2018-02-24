@@ -50,8 +50,8 @@ func ProvidersCall(request *restful.Request, response *restful.Response) {
 	le := Provider{Name: "LinkedEarth", Description: "EARTHCUBE Linked Earth Building Block", IndexName: "linkedearth"}
 	pa = append(pa, le)
 
-	// neotoma := Provider{Name: "Neotoma", Description: "Neotoma", IndexName: "neotoma"}
-	// pa = append(pa, neotoma)
+	neotoma := Provider{Name: "Neotoma", Description: "Neotoma", IndexName: "neotoma"}
+	pa = append(pa, neotoma)
 
 	ieda := Provider{Name: "IEDA", Description: "Interdisciplinary Earth Data Alliance ", IndexName: "ieda"}
 	pa = append(pa, ieda)
@@ -59,7 +59,7 @@ func ProvidersCall(request *restful.Request, response *restful.Response) {
 	rwg := Provider{Name: "EarthCube RWG", Description: "EarthCube Council of Data Facilities Registry Working Group", IndexName: "rwg"}
 	pa = append(pa, rwg)
 
-	csdco := Provider{Name: "CSDCO", Description: "Neotoma", IndexName: "csdco"}
+	csdco := Provider{Name: "CSDCO", Description: "CDCO", IndexName: "csdco"}
 	pa = append(pa, csdco)
 
 	data, _ := json.Marshal(pa)
