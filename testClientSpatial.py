@@ -53,4 +53,4 @@ data='''{
 PARAMS = {'geowithin':data, 'filter':"bco-dmo"}
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)
-# display(r.content)  # calls to geojson.io and opens your browser to view it..  
+display(r.content)  # calls to geojson.io and opens your browser to view it..  

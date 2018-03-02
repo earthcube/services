@@ -1,7 +1,7 @@
 package vocabulary
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 func holder() {

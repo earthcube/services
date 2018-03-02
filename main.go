@@ -1,8 +1,10 @@
 package main
 
 import (
-	"log"
 	"net/http"
+	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"earthcube.org/Project418/services/sparqlgateway"
 	"earthcube.org/Project418/services/spatialsearch"
@@ -11,6 +13,23 @@ import (
 	restful "github.com/emicklei/go-restful"
 	swagger "github.com/emicklei/go-restful-swagger12"
 )
+
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	log.SetFormatter(&log.JSONFormatter{})
+
+	// Output to stdout instead of the default stderr
+	// Can be any io.Writer, see below for File example
+	log.SetOutput(os.Stdout)
+
+	// Only log the warning severity or above.
+	// log.SetLevel(log.WarnLevel)
+}
+
+// IDEA   expose io.Writer
+// func kvLog() {
+
+// }
 
 func main() {
 	wsContainer := restful.NewContainer()

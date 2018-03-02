@@ -3,9 +3,10 @@ package spatialsearch
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/emicklei/go-restful"
 	"github.com/garyburd/redigo/redis"

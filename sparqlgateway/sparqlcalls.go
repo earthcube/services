@@ -2,9 +2,10 @@ package sparqlgateway
 
 import (
 	"bytes"
-	"log"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	sparql "github.com/knakk/sparql"
 )

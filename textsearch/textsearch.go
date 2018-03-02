@@ -3,11 +3,12 @@ package textsearch
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/blevesearch/bleve"
 	restful "github.com/emicklei/go-restful"
@@ -132,7 +133,6 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 // SearchSetCall return a set of organic results from across all the providers
 func SearchSetCall(request *restful.Request, response *restful.Response) {
 	phrase := request.QueryParameter("q")
-	log.Printf("Search Term: %s \n", phrase)
 
 	startPoint, err := strconv.ParseInt(request.QueryParameter("s"), 10, 32)
 	if err != nil {
@@ -164,6 +164,13 @@ func SearchSetCall(request *restful.Request, response *restful.Response) {
 			orsa = append(orsa, ors)
 		}
 	}
+
+	// Logging info
+	//  	log.Printf("Search Term: %s \n", phrase)
+	log.WithFields(log.Fields{
+		"query":  phrase,
+		"number": len(orsa), // not a good len...  it's a [][] really
+	}).Info("/api/v1/textindex/searchset")
 
 	// sort array putting them in order of top score...
 	sort.Sort(byScore(orsa))
@@ -271,9 +278,9 @@ func getResultSet(index bleve.IndexAlias, phrase string, numToReturn, startPoint
 			ors := OrganicResults{Position: k, IndexPath: item.Index, Score: item.Score, ID: item.ID}
 			ora = append(ora, ors)
 			fmt.Printf("\n%d: %s, %f, %s, %v\n", k, item.Index, item.Score, item.ID, item.Fragments)
-			for key, frag := range item.Fragments {
-				fmt.Printf("%s   %s\n", key, frag)
-			}
+			// for key, frag := range item.Fragments {
+			// 	fmt.Printf("%s   %s\n", key, frag)
+			// }
 		}
 	}
 

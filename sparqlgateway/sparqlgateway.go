@@ -2,8 +2,9 @@ package sparqlgateway
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	restful "github.com/emicklei/go-restful"
 )

@@ -2,8 +2,9 @@ package vocabulary
 
 import (
 	"bytes"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/knakk/sparql"
 )
