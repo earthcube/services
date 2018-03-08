@@ -26,6 +26,20 @@ type ResourceResults struct {
 	PubURL  string
 }
 
+// DetailResults is a place holder struct
+type DetailResults struct {
+	S             string
+	Aname         string
+	Name          string
+	URL           string
+	Description   string
+	Citation      string
+	Datepublished string
+	Curl          string
+	Keywords      string
+	License       string
+}
+
 // ResourceSetPeople struct
 type ResourceSetPeople struct {
 	G        string
@@ -77,6 +91,44 @@ func ResSetPeople(resources URLSet) []ResourceSetPeople {
 	}
 
 	return rra
+}
+
+// DetailsCall takes a single resource and returns the variable measured property value
+func DetailsCall(resources string) DetailResults {
+	repo, err := getP418SPARQL()
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	f := bytes.NewBufferString(queries)
+	bank := sparql.LoadBank(f)
+
+	q, err := bank.Prepare("detailsCall", resources)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	log.Printf("SPARQL: %s\n", q)
+
+	res, err := repo.Query(q)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	// rra := []DetailResults{}
+	bindings := res.Results.Bindings // map[string][]rdf.Term
+	// for _, i := range bindings {
+	// x := bindings["s"][0].Value
+
+	rr := DetailResults{S: bindings[0]["s"].Value,
+		Aname: bindings[0]["aname"].Value, URL: bindings[0]["url"].Value,
+		Description: bindings[0]["description"].Value, Citation: bindings[0]["citation"].Value,
+		Datepublished: bindings[0]["datepublished"].Value,
+		Curl:          bindings[0]["curl"].Value, Keywords: bindings[0]["keywords"].Value, License: bindings[0]["license"].Value}
+	// rra = append(rra, rr)
+	// }
+
+	return rr
 }
 
 // ResSetCall takes a single resource and returns the variable measured property value

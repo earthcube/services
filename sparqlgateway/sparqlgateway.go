@@ -42,13 +42,13 @@ func Dev() *restful.WebService {
 	service := new(restful.WebService)
 	service.
 		Path("/api/dev/graph").
-		Doc("Graph query services").
+		Doc("DEV: Graph query services").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON) //Consumes(restful.M).
 
 	// add in start point and length cursors
 	service.Route(service.GET("/resdetails").To(ResourceCall).
-		Doc("Call for details on a resource from the triplestore (graph)").
+		Doc("Call for measurement and prameter details").
 		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
 		Writes([]ResourceResults{}).
 		Operation("ResourceCall"))
@@ -59,14 +59,20 @@ func Dev() *restful.WebService {
 		Writes([]LogoResults{}).
 		Operation("Logo"))
 
+	service.Route(service.GET("/details").To(Details).
+		Doc("Call for details on a resource from the triplestore (graph)").
+		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
+		Writes([]LogoResults{}).
+		Operation("Details"))
+
 	return service
 }
 
-// Logo call for details on the resource from the graph
-func Logo(request *restful.Request, response *restful.Response) {
+// Details call for details on the resource from the graph
+func Details(request *restful.Request, response *restful.Response) {
 	resource := request.QueryParameter("r")
 
-	sr := LogoCall(resource)
+	sr := DetailsCall(resource)
 	response.WriteEntity(sr)
 }
 
@@ -75,6 +81,14 @@ func ResourceCall(request *restful.Request, response *restful.Response) {
 	resource := request.QueryParameter("r")
 
 	sr := ResCall(resource)
+	response.WriteEntity(sr)
+}
+
+// Logo call for details on the resource from the graph
+func Logo(request *restful.Request, response *restful.Response) {
+	resource := request.QueryParameter("r")
+
+	sr := LogoCall(resource)
 	response.WriteEntity(sr)
 }
 

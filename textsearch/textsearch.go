@@ -170,6 +170,7 @@ func SearchSetCall(request *restful.Request, response *restful.Response) {
 	log.WithFields(log.Fields{
 		"query":  phrase,
 		"number": len(orsa), // not a good len...  it's a [][] really
+		// "results": orsa,
 	}).Info("/api/v1/textindex/searchset")
 
 	// sort array putting them in order of top score...
@@ -247,7 +248,6 @@ func getMultiIndexAlias(searchIndex []string, im map[string]string) (bleve.Index
 // 		index = bleve.NewIndexAlias(index1)
 // 		log.Printf("Active index: %s", im[searchIndex])
 // 	}
-
 // 	return index
 // }
 
@@ -277,7 +277,9 @@ func getResultSet(index bleve.IndexAlias, phrase string, numToReturn, startPoint
 		for k, item := range hits {
 			ors := OrganicResults{Position: k, IndexPath: item.Index, Score: item.Score, ID: item.ID}
 			ora = append(ora, ors)
-			fmt.Printf("\n%d: %s, %f, %s, %v\n", k, item.Index, item.Score, item.ID, item.Fragments)
+			// fmt.Printf("\n%d: %s, %f, %s, %v\n", k, item.Index, item.Score, item.ID, item.Fragments)
+			fmt.Printf("  THIS IS THE ITEM %v\n", item)
+
 			// for key, frag := range item.Fragments {
 			// 	fmt.Printf("%s   %s\n", key, frag)
 			// }
