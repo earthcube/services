@@ -161,7 +161,7 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 		fmt.Printf("Error in scan %v \n", err)
 	}
 
-	log.Println(value1) // the point of this logging is what?
+	log.Println(value1) // the point of this logging is what?  the point of value1 is what!?
 
 	results, err := redisToGeoJSON(value2, filter)
 	if err != nil {
@@ -240,6 +240,15 @@ func redisToGeoJSON(results []interface{}, filter string) (string, error) {
 
 			rawGeometryJSON := []byte(val1)
 
+			if lt.Type == "Feature" {
+				f, err := geojson.UnmarshalFeature(rawGeometryJSON)
+				if err != nil {
+					log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
+				}
+				f.SetProperty("URL", val0)
+				fc.AddFeature(f)
+			}
+
 			if lt.Type == "Point" || lt.Type == "Poly" {
 				g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
 				if err != nil {
@@ -259,17 +268,7 @@ func redisToGeoJSON(results []interface{}, filter string) (string, error) {
 					log.Println(g.Type)
 				}
 			}
-
-			if lt.Type == "Feature" {
-				f, err := geojson.UnmarshalFeature(rawGeometryJSON)
-				if err != nil {
-					log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
-				}
-				f.SetProperty("URL", val0)
-				fc.AddFeature(f)
-			}
 		}
-
 	}
 
 	rawJSON, err := fc.MarshalJSON()

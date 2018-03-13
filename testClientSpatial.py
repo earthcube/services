@@ -1,8 +1,8 @@
 from geojsonio import display
 import requests
 
-# URL = 'http://localhost:6789/api/v1/spatial/search/object'
 URL = 'http://geodex.org/api/v1/spatial/search/object'
+#URL = 'http://geodex.org/api/v1/spatial/search/object'
 
 # http://get.iedadata.org/doi/315201  
 # {"type":"Polygon","coordinates":[[[-16.91266,28.11008],[-16.91266,33.31179],[-9.24511,33.31179],[-9.24511,28.11008],[-16.91266,28.11008]]]}
@@ -22,24 +22,62 @@ data='''{
         "coordinates": [
           [
             [
-              -95.97656249999999,
-              23.241346102386135
+              -112.8515625,
+              -29.535229562948444
             ],
             [
-              -88.24218749999999,
-              23.241346102386135
+              85.4296875,
+              -29.535229562948444
             ],
             [
-              -88.24218749999999,
-              29.53522956294847
+              85.4296875,
+              65.36683689226321
             ],
             [
-              -95.97656249999999,
-              29.53522956294847
+              -112.8515625,
+              65.36683689226321
             ],
             [
-              -95.97656249999999,
-              23.241346102386135
+              -112.8515625,
+              -29.535229562948444
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
+'''
+
+data2='''{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.4609375,
+              -41.77131167976406
+            ],
+            [
+              64.6875,
+              -41.77131167976406
+            ],
+            [
+              64.6875,
+              -8.754794702435618
+            ],
+            [
+              2.4609375,
+              -8.754794702435618
+            ],
+            [
+              2.4609375,
+              -41.77131167976406
             ]
           ]
         ]
@@ -50,7 +88,9 @@ data='''{
 '''
 
 # PARAMS = {'geowithin':data}
-PARAMS = {'geowithin':data, 'filter':"bco-dmo"}
+PARAMS = {'geowithin':data2, 'filter':"opencore"}
+# PARAMS = {'geowithin':data}
+
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)
 display(r.content)  # calls to geojson.io and opens your browser to view it..  

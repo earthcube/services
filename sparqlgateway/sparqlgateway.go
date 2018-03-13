@@ -34,6 +34,12 @@ func New() *restful.WebService {
 		Consumes("application/x-www-form-urlencoded").
 		Operation("ResourceSetPeopleCall"))
 
+	service.Route(service.GET("/details").To(Details).
+		Doc("Call for details on a resource from the triplestore (graph)").
+		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
+		Writes([]LogoResults{}).
+		Operation("Details"))
+
 	return service
 }
 
@@ -58,12 +64,6 @@ func Dev() *restful.WebService {
 		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
 		Writes([]LogoResults{}).
 		Operation("Logo"))
-
-	service.Route(service.GET("/details").To(Details).
-		Doc("Call for details on a resource from the triplestore (graph)").
-		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
-		Writes([]LogoResults{}).
-		Operation("Details"))
 
 	return service
 }

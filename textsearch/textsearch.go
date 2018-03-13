@@ -3,6 +3,7 @@ package textsearch
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"sort"
 	"strconv"
@@ -275,7 +276,7 @@ func getResultSet(index bleve.IndexAlias, phrase string, numToReturn, startPoint
 
 		// testing print loop
 		for k, item := range hits {
-			ors := OrganicResults{Position: k, IndexPath: item.Index, Score: item.Score, ID: item.ID}
+			ors := OrganicResults{Position: k, IndexPath: item.Index, Score: shortenFloat(item.Score, 2), ID: item.ID}
 			ora = append(ora, ors)
 			// fmt.Printf("\n%d: %s, %f, %s, %v\n", k, item.Index, item.Score, item.ID, item.Fragments)
 			fmt.Printf("  THIS IS THE ITEM %v\n", item)
@@ -287,6 +288,15 @@ func getResultSet(index bleve.IndexAlias, phrase string, numToReturn, startPoint
 	}
 
 	return ora
+}
+
+func round(num float64) int {
+	return int(num + math.Copysign(0.5, num))
+}
+
+func shortenFloat(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return float64(round(num*output)) / output
 }
 
 func maxFloat(ora []OrganicResults) (float64, error) {
