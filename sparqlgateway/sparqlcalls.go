@@ -75,7 +75,9 @@ func ResSetPeople(resources URLSet) []ResourceSetPeople {
 		log.Printf("%s\n", err)
 	}
 
-	log.Printf("SPARQL: %s\n", q)
+	log.WithFields(log.Fields{
+		"SPARQL": q,
+	}).Info("A SPARQL call in P418 services")
 
 	res, err := repo.Query(q)
 	if err != nil {
@@ -108,7 +110,11 @@ func DetailsCall(resources string) DetailResults {
 		log.Printf("%s\n", err)
 	}
 
-	log.Printf("SPARQL: %s\n", q)
+	// log.Printf("SPARQL: %s\n", q)
+
+	log.WithFields(log.Fields{
+		"SPARQL": q,
+	}).Info("A SPARQL call in P418 services")
 
 	res, err := repo.Query(q)
 	if err != nil {
@@ -146,7 +152,9 @@ func ResSetCall(resources URLSet) []ResourceResults {
 		log.Printf("%s\n", err)
 	}
 
-	log.Printf("SPARQL: %s\n", q)
+	log.WithFields(log.Fields{
+		"SPARQL": q,
+	}).Info("A SPARQL call in P418 services")
 
 	res, err := repo.Query(q)
 	if err != nil {
@@ -179,7 +187,9 @@ func ResCall(resource string) []ResourceResults {
 		log.Printf("%s\n", err)
 	}
 
-	log.Printf("SPARQL: %s\n", q)
+	log.WithFields(log.Fields{
+		"SPARQL": q,
+	}).Info("A SPARQL call in P418 services")
 
 	res, err := repo.Query(q)
 	if err != nil {
@@ -212,7 +222,9 @@ func LogoCall(resource string) []LogoResults {
 		log.Printf("%s\n", err)
 	}
 
-	log.Printf("SPARQL: %s\n", q)
+	log.WithFields(log.Fields{
+		"SPARQL": q,
+	}).Info("A SPARQL call in P418 services")
 
 	res, err := repo.Query(q)
 	if err != nil {

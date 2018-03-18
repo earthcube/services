@@ -18,20 +18,25 @@ func init() {
 	// Log as JSON instead of the default ASCII formatter.
 	log.SetFormatter(&log.JSONFormatter{})
 
-	// Output to stdout instead of the default stderr
-	// Can be any io.Writer, see below for File example
+	// Output to stdout instead of the default stderr, can be any io.Writer
+	// I override this and set output to file (io.Writer) in main
 	log.SetOutput(os.Stdout)
 
-	// Only log the warning severity or above.
-	// log.SetLevel(log.WarnLevel)
+	// Set log level
+	// Will log anything that is info or above (warn, error, fatal, panic). Default.
+	// only other level is debug
+	log.SetLevel(log.DebugLevel) // Info level for deployment
 }
 
-// IDEA   expose io.Writer
-// func kvLog() {
-
-// }
-
 func main() {
+	// Set up our log file for runs...
+	f, err := os.OpenFile("./log/serviceslog.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+	log.SetOutput(f)
+
 	wsContainer := restful.NewContainer()
 
 	// CORS

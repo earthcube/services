@@ -96,6 +96,11 @@ func ResSetCall(request *restful.Request, response *restful.Response) {
 		} else {
 			m[uri] = reply
 		}
+		log.WithFields(log.Fields{
+			"GEOHASH": uri,
+			"action":  "GET",
+			"key":     "p418",
+		}).Info("A spatial call in P418 services")
 	}
 
 	results, err := redisStringToGeoJSON(m)
@@ -104,6 +109,7 @@ func ResSetCall(request *restful.Request, response *restful.Response) {
 		response.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
+
 	response.Write([]byte(results))
 }
 
@@ -123,6 +129,12 @@ func ResCall(request *restful.Request, response *restful.Response) {
 		response.WriteErrorString(422, "This may not be a valid resources in our index")
 		return
 	}
+
+	log.WithFields(log.Fields{
+		"GEOHASH": resid,
+		"action":  "GET",
+		"key":     "p418",
+	}).Info("A spatial call in P418 services")
 
 	m := make(map[string]string)
 	m[resid] = reply
@@ -161,7 +173,13 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 		fmt.Printf("Error in scan %v \n", err)
 	}
 
-	log.Println(value1) // the point of this logging is what?  the point of value1 is what!?
+	log.WithFields(log.Fields{
+		"GEOHASH": geowithin,
+		"action":  "INTERSECT",
+		"key":     "p418",
+	}).Info("A spatial call in P418 services")
+
+	// log.Println(value1) // the point of this logging is what?  the point of value1 is what!?
 
 	results, err := redisToGeoJSON(value2, filter)
 	if err != nil {

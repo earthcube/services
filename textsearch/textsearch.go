@@ -119,8 +119,6 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 		}
 	}
 
-	log.Println(sia)
-
 	index, err := getMultiIndexAlias(sia, im) // we have our index
 	if err != nil {
 		response.WriteErrorString(422, "Error getting a set of indexes to search on.  (getMultiIndexalias)")
@@ -128,6 +126,14 @@ func SearchCall(request *restful.Request, response *restful.Response) {
 	}
 
 	ora := getResultSet(index, phrase, numToReturn, startPoint)
+
+	log.WithFields(log.Fields{
+		"ora":    ora,
+		"phrase": phrase,
+		"start":  startPoint,
+		"number": numToReturn,
+	}).Info("An organic text call in P418 services SearchCall")
+
 	response.WriteEntity(ora)
 }
 
@@ -166,16 +172,16 @@ func SearchSetCall(request *restful.Request, response *restful.Response) {
 		}
 	}
 
-	// Logging info
-	//  	log.Printf("Search Term: %s \n", phrase)
-	log.WithFields(log.Fields{
-		"query":  phrase,
-		"number": len(orsa), // not a good len...  it's a [][] really
-		// "results": orsa,
-	}).Info("/api/v1/textindex/searchset")
-
 	// sort array putting them in order of top score...
 	sort.Sort(byScore(orsa))
+
+	log.WithFields(log.Fields{
+		"orsa":   orsa,
+		"phrase": phrase,
+		"start":  startPoint,
+		"number": numToReturn,
+	}).Info("An organic text call in P418 services SearchSetCall")
+
 	response.WriteEntity(orsa)
 }
 
