@@ -40,6 +40,13 @@ func New() *restful.WebService {
 		Writes([]LogoResults{}).
 		Operation("Details"))
 
+	// add in start point and length cursors
+	service.Route(service.GET("/resdetails").To(ResourceCall).
+		Doc("Call for measurement and prameter details").
+		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
+		Writes([]ResourceResults{}).
+		Operation("ResourceCall"))
+
 	return service
 }
 
@@ -51,13 +58,6 @@ func Dev() *restful.WebService {
 		Doc("DEV: Graph query services").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON) //Consumes(restful.M).
-
-	// add in start point and length cursors
-	service.Route(service.GET("/resdetails").To(ResourceCall).
-		Doc("Call for measurement and prameter details").
-		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
-		Writes([]ResourceResults{}).
-		Operation("ResourceCall"))
 
 	service.Route(service.GET("/logo").To(Logo).
 		Doc("Call for logo URL on a resource from the triplestore (graph)").
