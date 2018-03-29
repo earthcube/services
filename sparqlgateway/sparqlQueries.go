@@ -3,6 +3,9 @@ package sparqlgateway
 const queries = `
 # Comments are ignored, except those tagging a query.
 
+# tag: describeCall
+DESCRIBE <{{.}}>
+
 # tag: detailsCall
 prefix schema: <http://schema.org/>
 prefix bds: <http://www.bigdata.com/rdf/search#>

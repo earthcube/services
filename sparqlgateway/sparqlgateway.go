@@ -65,7 +65,20 @@ func Dev() *restful.WebService {
 		Writes([]LogoResults{}).
 		Operation("Logo"))
 
+	service.Route(service.GET("/describe").To(Describe).
+		Doc("Describe a triple store resource").
+		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
+		Writes([]LogoResults{}).
+		Operation("Describe"))
+
 	return service
+}
+
+func Describe(request *restful.Request, response *restful.Response) {
+	resource := request.QueryParameter("r")
+
+	sr := DescribeCall(resource)
+	response.WriteEntity(sr)
 }
 
 // Details call for details on the resource from the graph

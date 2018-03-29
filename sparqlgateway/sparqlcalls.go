@@ -2,6 +2,7 @@ package sparqlgateway
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"time"
 
@@ -58,6 +59,40 @@ func getP418SPARQL() (*sparql.Repo, error) {
 		log.Printf("%s\n", err)
 	}
 	return repo, err
+}
+
+// DescribeCall takes a single resource and returns the variable measured property value
+func DescribeCall(resource string) string {
+	repo, err := getP418SPARQL()
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	f := bytes.NewBufferString(queries)
+	bank := sparql.LoadBank(f)
+
+	q, err := bank.Prepare("describeCall", resource)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	// log.Printf("SPARQL: %s\n", q)
+
+	log.WithFields(log.Fields{
+		"SPARQL": q,
+	}).Info("A SPARQL call in P418 services")
+
+	res, err := repo.Query(q)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	// jsonString, err := json.Marshal(res.Bindings())
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+
+	return fmt.Sprintf("%v", res.Bindings())
 }
 
 // ResSetPeople takes a single resource and returns the variable measured property value
