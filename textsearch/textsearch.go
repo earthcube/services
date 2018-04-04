@@ -1,10 +1,12 @@
 package textsearch
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -14,6 +16,13 @@ import (
 	"github.com/blevesearch/bleve"
 	restful "github.com/emicklei/go-restful"
 )
+
+type Provider struct {
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	IndexName     string `json:"index"`
+	IndexLocation string `json:"indexlocation"`
+}
 
 // OrganicResultsSet has top N results from each provider with scores
 type OrganicResultsSet struct {
@@ -201,14 +210,32 @@ func openIndex(indexPath string) (bleve.Index, error) {
 }
 
 func indexMap() map[string]string {
+	ic, err := os.Open("./indexcatalog.json")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer ic.Close()
+
+	pa := []Provider{}
+	jsonParser := json.NewDecoder(ic)
+	jsonParser.Decode(&pa)
+
 	im := make(map[string]string)
-	im["bcodmo"] = "indexes/bcodmo.bleve"
-	im["ocd"] = "indexes/ocd.bleve"
-	im["linkedearth"] = "indexes/linkedearth.bleve"
-	im["rwg"] = "indexes/rwg.bleve"
-	im["ieda"] = "indexes/ieda.bleve"
-	im["csdco"] = "indexes/csdco.bleve"
-	im["neotoma"] = "indexes/neotoma.bleve"
+
+	for e := range pa {
+		im[pa[e].IndexName] = pa[e].IndexLocation
+	}
+
+	// OLD static pattern..  remove this..
+	// im["bcodmo"] = "indexes/bcodmo.bleve"
+	// im["ocd"] = "indexes/ocd.bleve"
+	// im["linkedearth"] = "indexes/linkedearth.bleve"
+	// im["rwg"] = "indexes/rwg.bleve"
+	// im["ieda"] = "indexes/ieda.bleve"
+	// im["csdco"] = "indexes/csdco.bleve"
+	// im["neotoma"] = "indexes/neotoma.bleve"
+
+	log.Println(im)
 
 	return im
 }

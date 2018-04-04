@@ -1,0 +1,55 @@
+[{
+        "description": "Open Core Data",
+        "indexlocation": "./indexes/opencoredataorg",
+        "index": "ocd",
+        "name": "OpenCore"
+    },
+    {
+        "description": "Biological and Chemical Oceanography Data Management Office",
+        "indexlocation": "./indexes/wwwbco-dmoorg",
+        "index": "bcodmo",
+        "name": "BCO-DMO"
+    },
+    {
+        "description": "EARTHCUBE Linked Earth Building Block",
+        "indexlocation": "./indexes/wikilinkedearth",
+        "index": "linkedearth",
+        "name": "LinkedEarth"
+    },
+    {
+        "description": "Neotoma",
+        "indexlocation": "./indexes/dataneotomadborg",
+        "index": "neotoma",
+        "name": "Neotoma"
+    },
+    {
+        "description": "Interdisciplinary Earth Data Alliance ",
+        "indexlocation": "./indexes/getiedadataorg",
+        "index": "ieda",
+        "name": "IEDA"
+    },
+    {
+        "description": "BALTO",
+        "indexlocation": "./indexes/baltoopendaporg",
+        "index": "blato",
+        "name": "BALTO"
+    },
+    {
+        "description": "MagIC",
+        "indexlocation": "./indexes/earthreforg",
+        "index": "magic",
+        "name": "MagIC"
+    },
+    {
+        "description": "Open Topography",
+        "indexlocation": "./indexes/opentopographyorg",
+        "index": "opentopology",
+        "name": "opentopology"
+    },
+    {
+        "description": "UNAVCO",
+        "indexlocation": "./indexes/wwwunavcoorg",
+        "index": "unavco",
+        "name": "unavco"
+    }
+]

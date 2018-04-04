@@ -1,0 +1,18 @@
+PROJECT                                   CONSTRAINT     VERSION        REVISION  LATEST   PKGS USED
+github.com/blevesearch/bleve              ^0.5.0         v0.5.0         97393d0   v0.5.0   28
+github.com/blevesearch/go-porterstemmer   v1.0.1         v1.0.1         b4dd94e   v1.0.1   1
+github.com/blevesearch/segment            branch master  branch master  762005e   762005e  1
+github.com/boltdb/bolt                    v1.3.1         v1.3.1         2f1ce7a   v1.3.1   1
+github.com/emicklei/go-restful            ^2.5.0         v2.5.0         2dd4403   v2.6.0   2
+github.com/emicklei/go-restful-swagger12  ^1.0.1         1.0.1          dcef7f5   1.0.1    1
+github.com/garyburd/redigo                ^1.4.0         v1.4.0         d1ed5c6   v1.6.0   2
+github.com/golang/protobuf                branch master  branch master  1e59b77   e09c5db  1
+github.com/knakk/digest                   branch master  branch master  fd45bec   fd45bec  1
+github.com/knakk/rdf                      branch master  branch master  b6ee24f   b6ee24f  1
+github.com/knakk/sparql                   branch master  branch master  3de19ad   3de19ad  1
+github.com/paulmach/go.geojson            v1.3.1         v1.3.1         aa3713d   v1.3.1   1
+github.com/sirupsen/logrus                v1.0.5         v1.0.5         c155da1   v1.0.5   1
+github.com/steveyen/gtreap                branch master  branch master  0abe01e   0abe01e  1
+golang.org/x/crypto                       branch master  branch master  b2aa354   b2aa354  1
+golang.org/x/net                          branch master  branch master  5ccada7   b68f304  1
+golang.org/x/sys                          branch master  branch master  2c42eef   f67933e  2

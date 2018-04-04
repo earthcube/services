@@ -2,10 +2,59 @@
 
 
 [[projects]]
+  name = "github.com/RoaringBitmap/roaring"
+  packages = ["."]
+  revision = "6f670287d7ec5bb044dc8afcc8cb904113fd581a"
+  version = "v0.4.4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/Smerity/govarint"
+  packages = ["."]
+  revision = "7265e41f48f15fd61751e16da866af3c704bb3ab"
+
+[[projects]]
   name = "github.com/blevesearch/bleve"
-  packages = [".","analysis","analysis/analyzers/standard_analyzer","analysis/datetime_parsers/datetime_optional","analysis/datetime_parsers/flexible_go","analysis/language/en","analysis/token_filters/lower_case_filter","analysis/token_filters/porter","analysis/token_filters/stop_tokens_filter","analysis/tokenizers/unicode","document","index","index/store","index/store/boltdb","index/store/gtreap","index/upside_down","numeric_util","registry","search","search/collectors","search/facets","search/highlight","search/highlight/fragment_formatters/html","search/highlight/fragmenters/simple","search/highlight/highlighters/html","search/highlight/highlighters/simple","search/scorers","search/searchers"]
-  revision = "97393d027342f43b17da2f02c090a4e728ac929f"
-  version = "v0.5.0"
+  packages = [
+    ".",
+    "analysis",
+    "analysis/analyzer/standard",
+    "analysis/datetime/flexible",
+    "analysis/datetime/optional",
+    "analysis/lang/en",
+    "analysis/token/lowercase",
+    "analysis/token/porter",
+    "analysis/token/stop",
+    "analysis/tokenizer/unicode",
+    "document",
+    "geo",
+    "index",
+    "index/scorch",
+    "index/scorch/mergeplan",
+    "index/scorch/segment",
+    "index/scorch/segment/mem",
+    "index/scorch/segment/zap",
+    "index/store",
+    "index/store/boltdb",
+    "index/store/gtreap",
+    "index/upsidedown",
+    "mapping",
+    "numeric",
+    "registry",
+    "search",
+    "search/collector",
+    "search/facet",
+    "search/highlight",
+    "search/highlight/format/html",
+    "search/highlight/fragmenter/simple",
+    "search/highlight/highlighter/html",
+    "search/highlight/highlighter/simple",
+    "search/query",
+    "search/scorer",
+    "search/searcher"
+  ]
+  revision = "1a319cdf5bf77dc8cee35a6b99f908792c2547ef"
+  version = "v0.7.0"
 
 [[projects]]
   name = "github.com/blevesearch/go-porterstemmer"
@@ -26,8 +75,27 @@
   version = "v1.3.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/couchbase/vellum"
+  packages = [
+    ".",
+    "regexp",
+    "utf8"
+  ]
+  revision = "5083a469fcef50a4705e3c90652246ecd6806f2a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/edsrzf/mmap-go"
+  packages = ["."]
+  revision = "0bce6a6887123b67a60366d2c9fe2dfb74289d2e"
+
+[[projects]]
   name = "github.com/emicklei/go-restful"
-  packages = [".","log"]
+  packages = [
+    ".",
+    "log"
+  ]
   revision = "2dd44038f0b95ae693b266c5f87593b5d2fdd78d"
   version = "v2.5.0"
 
@@ -39,9 +107,18 @@
 
 [[projects]]
   name = "github.com/garyburd/redigo"
-  packages = ["internal","redis"]
+  packages = [
+    "internal",
+    "redis"
+  ]
   revision = "d1ed5c67e5794de818ea85e6b522fda02623a484"
   version = "v1.4.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/glycerine/go-unsnap-stream"
+  packages = ["."]
+  revision = "9f0cb55181dd3a0a4c168d3dbc72d4aca4853126"
 
 [[projects]]
   branch = "master"
@@ -51,15 +128,75 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/kpawlik/geojson"
+  name = "github.com/golang/snappy"
   packages = ["."]
-  revision = "1a4f120c6b41bf523f825519ef8c25a50d1c9628"
+  revision = "553a641470496b2327abcac10b36396bd98e45c9"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/knakk/digest"
+  packages = ["."]
+  revision = "fd45becddc49e7c583e46de4af3b9b3b37e629e3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/knakk/rdf"
+  packages = ["."]
+  revision = "b6ee24f8f40ff0580683aefb6831dad263a3f751"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/knakk/sparql"
+  packages = ["."]
+  revision = "3de19ad6a5dcee30dd5e101b47e3aedc7f69ef57"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mschoch/smat"
+  packages = ["."]
+  revision = "90eadee771aeab36e8bf796039b8c261bebebe4f"
+
+[[projects]]
+  name = "github.com/paulmach/go.geojson"
+  packages = ["."]
+  revision = "aa3713dea4327980f5891ac781c6f1a45ea75c0f"
+  version = "v1.3.1"
+
+[[projects]]
+  name = "github.com/philhofer/fwd"
+  packages = ["."]
+  revision = "bb6d471dc95d4fe11e432687f8b70ff496cf3136"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
 
 [[projects]]
   branch = "master"
   name = "github.com/steveyen/gtreap"
   packages = ["."]
   revision = "0abe01ef9be25c4aedc174758ec2d917314d6d70"
+
+[[projects]]
+  name = "github.com/tinylib/msgp"
+  packages = ["msgp"]
+  revision = "b2b6a672cf1e5b90748f79b8b81fc8c5cf0571a1"
+  version = "1.0.2"
+
+[[projects]]
+  name = "github.com/willf/bitset"
+  packages = ["."]
+  revision = "d860f346b89450988a379d7d705e83c58d1ea227"
+  version = "v1.1.3"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "b2aa35443fbc700ab74c586ae79b81c171851023"
 
 [[projects]]
   branch = "master"
@@ -70,12 +207,15 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "2c42eef0765b9837fbdab12011af7830f55f88f0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ad9105ec1d011c886518670a4400a90a900c3528b93ff9af26d6ec2d006b03e1"
+  inputs-digest = "ddccea578a92dd3a927ead56c2b6dacb36aa48c6d73430307acf585230d1eaa5"
   solver-name = "gps-cdcl"
   solver-version = 1

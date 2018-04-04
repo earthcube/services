@@ -88,9 +88,9 @@ data2='''{
 '''
 
 # PARAMS = {'geowithin':data}
-PARAMS = {'geowithin':data2, 'filter':"opencore"}
-# PARAMS = {'geowithin':data}
+#PARAMS = {'geowithin':data2, 'filter':"opencore"}
+PARAMS = {'geowithin':data2}
 
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)
-display(r.content)  # calls to geojson.io and opens your browser to view it..  
+#display(r.content)  # calls to geojson.io and opens your browser to view it..  
