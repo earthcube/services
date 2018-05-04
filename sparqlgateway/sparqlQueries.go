@@ -11,15 +11,17 @@ prefix schema: <http://schema.org/>
 prefix bds: <http://www.bigdata.com/rdf/search#>
 select distinct ?s ?aname ?name ?url ?description ?citation ?datepublished ?curl  ?keywords ?license
 where {
- VALUES ?s { <{{.}}> }.
+VALUES ?url { <{{.}}> }.
+?s rdf:type schema:Dataset .
+?s <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?url
 OPTIONAL { ?s schema:alternateName ?aname } .
 OPTIONAL { ?s schema:citation      ?citation }
 OPTIONAL { ?s schema:datePublished ?datepublished }
 OPTIONAL { ?s schema:description   ?description }
 OPTIONAL { ?s schema:distribution ?distribution }
 OPTIONAL { ?s schema:distribution ?distribution .
-           ?distribution schema:contentUrl ?curl .
-         }
+          ?distribution schema:contentUrl ?curl .
+        }
 OPTIONAL { ?s schema:identifier ?identifier }
 OPTIONAL { ?s schema:keywords ?keywords }
 OPTIONAL { ?s schema:license       ?license}
@@ -27,7 +29,6 @@ OPTIONAL { ?s schema:name         ?name}
 OPTIONAL { ?s schema:url ?url}
 OPTIONAL { ?s schema:measurementTechnique ?measurementtechnique }
 }
-
 
 
 # tag: LogoCall

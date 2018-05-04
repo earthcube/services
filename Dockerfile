@@ -10,6 +10,7 @@ FROM scratch
 # later as the indexes grow
 ADD services /
 ADD log /log
+ADD indexcatalog.json /
 # ADD logs /logs  or mount in the volume in the compose or docker command
 
 # NOTE make sure to mount the bleve indexes to /index

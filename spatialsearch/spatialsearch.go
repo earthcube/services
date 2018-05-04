@@ -245,7 +245,7 @@ func redisToGeoJSON(results []interface{}, filter string) (string, error) {
 		valcast := item.([]interface{})
 		val0 := fmt.Sprintf("%s", valcast[0])
 		val1 := fmt.Sprintf("%s", valcast[1])
-		// log.Printf("%s %s \n", val0, val1)
+		//log.Printf("%s %s \n", val0, val1)
 
 		if strings.Contains(val0, filter) || filter == "" {
 
@@ -258,16 +258,38 @@ func redisToGeoJSON(results []interface{}, filter string) (string, error) {
 
 			rawGeometryJSON := []byte(val1)
 
-			if lt.Type == "Feature" {
+			switch lt.Type {
+			case "FeatureCollection":
+				fcf, err := geojson.UnmarshalFeatureCollection(rawGeometryJSON)
+				if err != nil {
+					log.Printf("Unmarshal featurecollection error for %s with %s\n", val0, err)
+				}
+				for _, f := range fcf.Features {
+					f.SetProperty("URL", val0)
+					fc.AddFeature(f)
+				}
+				break
+
+			case "Feature":
 				f, err := geojson.UnmarshalFeature(rawGeometryJSON)
 				if err != nil {
 					log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
 				}
 				f.SetProperty("URL", val0)
 				fc.AddFeature(f)
-			}
+				break
 
-			if lt.Type == "Point" || lt.Type == "Poly" {
+			case "Point":
+				g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
+				if err != nil {
+					log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
+				}
+				f := geojson.NewFeature(g)
+				f.SetProperty("URL", val0)
+				fc.AddFeature(f)
+				break
+
+			case "Poly":
 				g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
 				if err != nil {
 					log.Printf("Unmarshal geom error for %s with %s\n", val0, err)
@@ -285,6 +307,7 @@ func redisToGeoJSON(results []interface{}, filter string) (string, error) {
 				default:
 					log.Println(g.Type)
 				}
+				break
 			}
 		}
 	}

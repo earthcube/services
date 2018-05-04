@@ -44,12 +44,18 @@
         "description": "Open Topography",
         "indexlocation": "./indexes/opentopographyorg",
         "index": "opentopology",
-        "name": "opentopology"
+        "name": "Open Topography"
+    },
+    {
+        "description": "IRIS",
+        "indexlocation": "./indexes/dsirisedu",
+        "index": "iris",
+        "name": "IRIS"
     },
     {
         "description": "UNAVCO",
         "indexlocation": "./indexes/wwwunavcoorg",
         "index": "unavco",
-        "name": "unavco"
+        "name": "UNAVCO"
     }
 ]

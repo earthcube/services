@@ -1,8 +1,8 @@
 from geojsonio import display
 import requests
 
+#URL = 'http://localhost:6789/api/v1/spatial/search/object'
 URL = 'http://geodex.org/api/v1/spatial/search/object'
-#URL = 'http://geodex.org/api/v1/spatial/search/object'
 
 # http://get.iedadata.org/doi/315201  
 # {"type":"Polygon","coordinates":[[[-16.91266,28.11008],[-16.91266,33.31179],[-9.24511,33.31179],[-9.24511,28.11008],[-16.91266,28.11008]]]}
@@ -60,37 +60,36 @@ data2='''{
         "coordinates": [
           [
             [
-              2.4609375,
-              -41.77131167976406
+              -102.3046875,
+              -27.371767300523032
             ],
             [
-              64.6875,
-              -41.77131167976406
+              72.421875,
+              -27.371767300523032
             ],
             [
-              64.6875,
-              -8.754794702435618
+              72.421875,
+              65.94647177615738
             ],
             [
-              2.4609375,
-              -8.754794702435618
+              -102.3046875,
+              65.94647177615738
             ],
             [
-              2.4609375,
-              -41.77131167976406
+              -102.3046875,
+              -27.371767300523032
             ]
           ]
         ]
       }
     }
   ]
-}
-'''
+}'''
 
 # PARAMS = {'geowithin':data}
-#PARAMS = {'geowithin':data2, 'filter':"opencore"}
+# PARAMS = {'geowithin':data2, 'filter':"opencore"}
 PARAMS = {'geowithin':data2}
 
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)
-#display(r.content)  # calls to geojson.io and opens your browser to view it..  
+# display(r.content)  # calls to geojson.io and opens your browser to view it..  
