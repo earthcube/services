@@ -160,14 +160,18 @@ func DetailsCall(resources string) DetailResults {
 	bindings := res.Results.Bindings // map[string][]rdf.Term
 	// for _, i := range bindings {
 	// x := bindings["s"][0].Value
-
-	rr := DetailResults{S: bindings[0]["s"].Value,
-		Aname: bindings[0]["aname"].Value, URL: bindings[0]["url"].Value,
-		Description: bindings[0]["description"].Value, Citation: bindings[0]["citation"].Value,
-		Datepublished: bindings[0]["datepublished"].Value,
-		Curl:          bindings[0]["curl"].Value, Keywords: bindings[0]["keywords"].Value, License: bindings[0]["license"].Value}
 	// rra = append(rra, rr)
 	// }
+
+	rr := DetailResults{}
+
+	if len(bindings) > 0 {
+		rr = DetailResults{S: bindings[0]["s"].Value,
+			Aname: bindings[0]["aname"].Value, URL: bindings[0]["url"].Value,
+			Description: bindings[0]["description"].Value, Citation: bindings[0]["citation"].Value,
+			Datepublished: bindings[0]["datepublished"].Value,
+			Curl:          bindings[0]["curl"].Value, Keywords: bindings[0]["keywords"].Value, License: bindings[0]["license"].Value}
+	}
 
 	return rr
 }
