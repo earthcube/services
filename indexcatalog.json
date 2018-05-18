@@ -43,7 +43,7 @@
     {
         "description": "Open Topography",
         "indexlocation": "./indexes/opentopographyorg",
-        "index": "opentopology",
+        "index": "opentopographyorg",
         "name": "Open Topography"
     },
     {

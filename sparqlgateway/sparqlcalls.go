@@ -167,10 +167,14 @@ func DetailsCall(resources string) DetailResults {
 
 	if len(bindings) > 0 {
 		rr = DetailResults{S: bindings[0]["s"].Value,
-			Aname: bindings[0]["aname"].Value, URL: bindings[0]["url"].Value,
+			Aname:       bindings[0]["aname"].Value,
+			Name:        bindings[0]["name"].Value,
+			URL:         bindings[0]["url"].Value,
 			Description: bindings[0]["description"].Value, Citation: bindings[0]["citation"].Value,
 			Datepublished: bindings[0]["datepublished"].Value,
-			Curl:          bindings[0]["curl"].Value, Keywords: bindings[0]["keywords"].Value, License: bindings[0]["license"].Value}
+			Curl:          bindings[0]["curl"].Value,
+			Keywords:      bindings[0]["keywords"].Value,
+			License:       bindings[0]["license"].Value}
 	}
 
 	return rr

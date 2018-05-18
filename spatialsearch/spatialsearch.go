@@ -104,11 +104,14 @@ func ResSetCall(request *restful.Request, response *restful.Response) {
 	}
 
 	results, err := redisStringToGeoJSON(m)
+	// results, err := redisToGeoJSON(m)
 	if err != nil {
 		log.Println(err)
 		response.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
+
+	fmt.Printf("==> %s \n", results)
 
 	response.Write([]byte(results))
 }
@@ -218,8 +221,10 @@ func redisStringToGeoJSON(m map[string]string) (string, error) {
 			log.Println(g.Type)
 		}
 
-		if g.Type == "Feature" {
-			f, err := geojson.UnmarshalFeature(rawGeometryJSON)
+		if g.Type == "FeatureCollection" {
+			fmt.Println("In Feature")
+			ifc, err := geojson.UnmarshalFeatureCollection(rawGeometryJSON)
+			f := ifc.Features[0]
 			if err != nil {
 				log.Printf("Unmarshal feature error for %s with %s\n", ID, err)
 			}

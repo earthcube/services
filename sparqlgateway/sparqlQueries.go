@@ -31,6 +31,7 @@ OPTIONAL { ?s schema:measurementTechnique ?measurementtechnique }
 }
 
 
+
 # tag: LogoCall
 PREFIX schema: <http://schema.org/>
 SELECT DISTINCT ?graph ?type ?resource ?logo
@@ -66,6 +67,25 @@ WHERE
   ?res schema:description ?desc     
 } 
 
+# tag: ResourceSetIGSN
+prefix schema: <http://schema.org/>
+SELECT DISTINCT ?igsn
+WHERE
+{
+VALUES ?ID
+{  <http://get.iedadata.org/doi/100415> <http://get.iedadata.org/doi/100416>
+}
+ ?dataset a schema:Dataset .
+ ?dataset rdfs:seeAlso ?ID .
+ ?dataset schema:hasPart ?sample .
+ ?sample schema:additionalType "http://schema.geolink.org/1.0/base/main#PhysicalSample" .
+ ?sample schema:identifier ?id .
+ ?id schema:propertyID "IGSN" .
+ ?id schema:value ?igsn .  
+}
+
+
+
 # tag: ResourceSetResults
 prefix schema: <http://schema.org/>
 SELECT DISTINCT ?val ?desc ?pubname ?puburl
@@ -89,31 +109,47 @@ OPTIONAL { ?pub schema:url ?puburl }
 
 # tag: ResourceSetPeople
 PREFIX schema: <http://schema.org/>
-SELECT DISTINCT ?g ?person (IF(?role = schema:contributor, "Contributor", IF(?role = schema:creator, "Creator/Author", "Author")) as ?rolename) ?name ?url ?orcid
+SELECT DISTINCT ?g ?person ?person_role (IF(?role = schema:contributor, "Contributor", IF(?role = schema:creator, "Creator/Author", "Author")) as ?rolename) ?name ?url ?orcid
 WHERE
 {
-  GRAPH ?g {
-   VALUES ?dataset
-   {  {{.}}
-   }
-   VALUES ?role
-   {
-    schema:author
-    schema:creator
-    schema:contributor
-   }
-   { ?dataset ?role ?person }
-   OPTIONAL {
-    ?person a schema:Person .
-    OPTIONAL { ?person schema:name ?name }
-    OPTIONAL { ?person schema:url ?url }
-    OPTIONAL { 
-      ?person schema:identifier ?id .
-      ?id schema:propertyID "datacite:orcid" .
-      ?id schema:value ?orcid
-    }
-   }
+ GRAPH ?g {
+  VALUES ?dataset
+  {   {{.}}
   }
+  VALUES ?role
+  {
+   schema:author
+   schema:creator
+   schema:contributor
+  }
+  VALUES ?orcid_type {
+    "datacite:orcid"
+    "http://purl.org/spar/datacite/orcid"
+  }
+  { ?dataset ?role ?person_role }
+  OPTIONAL {
+    {
+     ?person_role a schema:Role .
+     ?person_role ?role ?person .
+     OPTIONAL { ?person schema:name ?name }
+     OPTIONAL { ?person schema:url ?url }
+     OPTIONAL {
+       ?person schema:identifier ?id .
+       ?id schema:propertyID ?orcid_type .
+       ?id schema:value ?orcid
+     }
+    } UNION {
+     ?person_role a schema:Person .
+     OPTIONAL { ?person_role schema:name ?name }
+     OPTIONAL { ?person_role schema:url ?url }
+     OPTIONAL {
+       ?person_role schema:identifier ?id .
+       ?id schema:propertyID ?orcid_type .
+       ?id schema:value ?orcid
+     }
+    }
+  }
+ }
 }
 
 
