@@ -11,7 +11,7 @@
   * [Funder](#dataset-funder)
   * [Publisher/Provider](#dataset-publisher_provider)
   * [Query Inputs](#dataset-search-endpoint)
- 
+* [Assay](#assay)
 <hr/>
 
 
@@ -285,6 +285,22 @@ WHERE
   }  
 }
 ORDER BY ?dataset ?action_target
+```
+
+<a id="#assay"></a>
+## Assay ##
+
+### Organizational Logo ###
+```
+PREFIX schema: <http://schema.org/>
+SELECT DISTINCT ?graph ?logo_url
+WHERE {
+  GRAPH ?graph {
+    ?resource rdf:type schema:Organization .
+    ?resource schema:logo [ schema:url ?logo_url ] .
+  }
+}
+ORDER BY ?graph
 ```
 
 Back to [Top](#top)
