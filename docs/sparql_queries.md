@@ -11,7 +11,6 @@
   * [Funder](#dataset-funder)
   * [Publisher/Provider](#dataset-publisher_provider)
   * [Query Inputs](#dataset-search-endpoint)
- 
 <hr/>
 
 
@@ -286,5 +285,4 @@ WHERE
 }
 ORDER BY ?dataset ?action_target
 ```
-
 Back to [Top](#top)
