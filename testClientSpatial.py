@@ -49,6 +49,29 @@ data='''{
 }
 '''
 
+data3= '''
+{
+	"type": "Feature",
+	"id": 1,
+	"properties": {
+		"dummy": 0.0
+	},
+	"geometry": {
+		"type": "Polygon",
+		"coordinates": [
+			[
+				[-1.684286582529027, 59.758556912514905],
+				[11.250000000675005, 65.090030158598523],
+				[24.184286582393444, 59.75855691307941],
+				[17.834431060727248, 52.583358975375795],
+				[4.665568940078517, 52.583358975086604],
+				[-1.684286582529027, 59.758556912514905]
+			]
+		]
+	}
+}
+'''
+
 data2='''{
   "type": "FeatureCollection",
   "features": [
@@ -88,7 +111,7 @@ data2='''{
 
 # PARAMS = {'geowithin':data}
 # PARAMS = {'geowithin':data2, 'filter':"opencore"}
-PARAMS = {'geowithin':data2}
+PARAMS = {'geowithin':data3}
 
 r = requests.get(url = URL, params = PARAMS)
 print(r.content)

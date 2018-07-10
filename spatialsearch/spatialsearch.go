@@ -41,22 +41,23 @@ func New() *restful.WebService {
 		Produces("application/vnd.geo+json")
 
 	service.Route(service.GET("/search/object").To(SpatialCall).
-		Doc("get expeditions from a spatial polygon defined by geojson").
+		Doc("Search by a GeoJSON object and get all know intersecting features").
 		Param(service.QueryParameter("geowithin", "Polygon in WKT format within which to look for features.  Try `POLYGON((-72.2021484375 38.58896696823242,-59.1943359375 38.58896696823242,-59.1943359375 28.11801628757283,-72.2021484375 28.11801628757283,-72.2021484375 38.58896696823242))`").DataType("string")).
-		Param(service.QueryParameter("filter", "Filter the URL property in the GeoJSON for the pattern in this parameter if present ").DataType("string")).
+		Param(service.QueryParameter("filter", "Filter a URL property in the GeoJSON for the pattern in this parameter").DataType("string")).
+		Param(service.QueryParameter("remove", "Remove a URL property in the GeoJSON for the pattern in this parameter").DataType("string")).
 		ReturnsError(400, "Unable to handle request", nil).
 		Produces("application/vnd.geo+json").
 		Operation("SpatialCall"))
 
 	service.Route(service.GET("/search/resource").To(ResCall).
-		Doc("get expeditions from a spatial polygon defined by geojson").
+		Doc("Search on a resource ID and get its spatial information in GeoJSON").
 		Param(service.QueryParameter("id", "ID of the resource to locate").DataType("string")).
 		ReturnsError(400, "Unable to handle request", nil).
 		Produces("application/vnd.geo+json").
 		Operation("ResCall"))
 
 	service.Route(service.POST("/search/resourceset").To(ResSetCall).
-		Doc("Call for details on an array of resources from the triplestore (graph)").
+		Doc("Search on a set of resource IDs and get their spatial information in GeoJSON").
 		Param(service.BodyParameter("body", "The body containing an array of URIs to obtain parameter values from")).
 		Consumes("application/x-www-form-urlencoded").
 		Produces("application/vnd.geo+json").
@@ -154,6 +155,8 @@ func ResCall(request *restful.Request, response *restful.Response) {
 func SpatialCall(request *restful.Request, response *restful.Response) {
 	geowithin := request.QueryParameter("geowithin")
 	filter := request.QueryParameter("filter")
+	remove := request.QueryParameter("remove")
+
 	// log.Printf("Called with filter: %s and geojson %s \n", filter, geowithin)
 
 	_, err := geojson.UnmarshalFeatureCollection([]byte(geowithin))
@@ -184,7 +187,7 @@ func SpatialCall(request *restful.Request, response *restful.Response) {
 
 	// log.Println(value1) // the point of this logging is what?  the point of value1 is what!?
 
-	results, err := redisToGeoJSON(value2, filter)
+	results, err := redisToGeoJSON(value2, filter, remove)
 	if err != nil {
 		log.Println(err)
 		response.WriteHeader(http.StatusUnprocessableEntity)
@@ -242,7 +245,7 @@ func redisStringToGeoJSON(m map[string]string) (string, error) {
 	return string(rawJSON), nil
 }
 
-func redisToGeoJSON(results []interface{}, filter string) (string, error) {
+func redisToGeoJSON(results []interface{}, filter, remove string) (string, error) {
 
 	fc := geojson.NewFeatureCollection()
 
@@ -250,72 +253,85 @@ func redisToGeoJSON(results []interface{}, filter string) (string, error) {
 		valcast := item.([]interface{})
 		val0 := fmt.Sprintf("%s", valcast[0])
 		val1 := fmt.Sprintf("%s", valcast[1])
-		//log.Printf("%s %s \n", val0, val1)
+		// log.Printf("%s %s \n", val0, val1)
 
-		if strings.Contains(val0, filter) || filter == "" {
+		// TODO add logic here to scope in or out based on "filter" or "remove"
+		skip := false
+		if strings.Contains(val0, remove) && remove != "" {
+			fmt.Printf("In the skip test with %s \n", val0)
+			skip = true
+		}
 
-			lt := &LocType{}
-			err := json.Unmarshal([]byte(val1), lt)
-			if err != nil {
-				log.Print(err)
-				return "", err
-			}
+		fmt.Printf("Continuing on with %v \n ", skip)
 
-			rawGeometryJSON := []byte(val1)
+		if skip != true {
+			if strings.Contains(val0, filter) || filter == "" {
 
-			switch lt.Type {
-			case "FeatureCollection":
-				fcf, err := geojson.UnmarshalFeatureCollection(rawGeometryJSON)
+				lt := &LocType{}
+				err := json.Unmarshal([]byte(val1), lt)
 				if err != nil {
-					log.Printf("Unmarshal featurecollection error for %s with %s\n", val0, err)
+					log.Print(err)
+					return "", err
 				}
-				for _, f := range fcf.Features {
+
+				rawGeometryJSON := []byte(val1)
+
+				switch lt.Type {
+				case "FeatureCollection":
+					fcf, err := geojson.UnmarshalFeatureCollection(rawGeometryJSON)
+					if err != nil {
+						log.Printf("Unmarshal featurecollection error for %s with %s\n", val0, err)
+					}
+					for _, f := range fcf.Features {
+						f.SetProperty("URL", val0)
+						fc.AddFeature(f)
+					}
+					break
+
+				case "Feature":
+					f, err := geojson.UnmarshalFeature(rawGeometryJSON)
+					if err != nil {
+						log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
+					}
 					f.SetProperty("URL", val0)
 					fc.AddFeature(f)
-				}
-				break
+					break
 
-			case "Feature":
-				f, err := geojson.UnmarshalFeature(rawGeometryJSON)
-				if err != nil {
-					log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
-				}
-				f.SetProperty("URL", val0)
-				fc.AddFeature(f)
-				break
+				case "Point":
+					g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
+					if err != nil {
+						log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
+					}
+					f := geojson.NewFeature(g)
+					f.SetProperty("URL", val0)
+					fc.AddFeature(f)
+					break
 
-			case "Point":
-				g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
-				if err != nil {
-					log.Printf("Unmarshal feature error for %s with %s\n", val0, err)
-				}
-				f := geojson.NewFeature(g)
-				f.SetProperty("URL", val0)
-				fc.AddFeature(f)
-				break
+				case "Poly":
+					g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
+					if err != nil {
+						log.Printf("Unmarshal geom error for %s with %s\n", val0, err)
+					}
 
-			case "Poly":
-				g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
-				if err != nil {
-					log.Printf("Unmarshal geom error for %s with %s\n", val0, err)
+					switch {
+					case g.IsPoint():
+						nf := geojson.NewFeature(g)
+						nf.SetProperty("URL", val0)
+						fc.AddFeature(nf)
+					case g.IsPolygon():
+						nf := geojson.NewFeature(g)
+						nf.SetProperty("URL", val0)
+						fc.AddFeature(nf)
+					default:
+						log.Println(g.Type)
+					}
+					break
 				}
-
-				switch {
-				case g.IsPoint():
-					nf := geojson.NewFeature(g)
-					nf.SetProperty("URL", val0)
-					fc.AddFeature(nf)
-				case g.IsPolygon():
-					nf := geojson.NewFeature(g)
-					nf.SetProperty("URL", val0)
-					fc.AddFeature(nf)
-				default:
-					log.Println(g.Type)
-				}
-				break
 			}
 		}
 	}
+
+	fmt.Printf("reviewed %d items\n", len(results))
 
 	rawJSON, err := fc.MarshalJSON()
 	if err != nil {

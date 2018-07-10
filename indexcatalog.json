@@ -1,59 +1,98 @@
-[{
-        "description": "Open Core Data",
-        "indexlocation": "./indexes/opencoredataorg",
-        "index": "ocd",
-        "name": "OpenCore"
+[
+    {
+        "description": "HydroShare; operated by The Consortium of Universities for the Advancement of Hydrologic Science Inc.",
+        "logo": "http://geodex.org/images/logos/cuahsiHydroshare.png",
+        "indexlocation": "./indexes/wwwhydroshareorg",
+        "index": "wwwhydroshareorg",
+        "name": "HydroShare"
     },
     {
         "description": "Biological and Chemical Oceanography Data Management Office",
+        "logo": "http://geodex.org/images/logos/bco-dmo-words-BLUE.jpg",
         "indexlocation": "./indexes/wwwbco-dmoorg",
         "index": "bcodmo",
         "name": "BCO-DMO"
     },
     {
+        "description": "Biological and Chemical Oceanography Data Management Office",
+        "logo": "http://geodex.org/images/logos/bco-dmo-words-BLUE.jpg",
+        "indexlocation": "./indexes/wwwbco-dmoorg_data",
+        "index": "bcodmodata",
+        "name": "BCO-DMO_Data"
+    },
+    {
+        "description": "Continental Scientific Drilling Coordination Office",
+        "logo": "http://geodex.org/images/logos/csdco.png",
+        "indexlocation": "./indexes/csdco",
+        "index": "csdco",
+        "name": "CSDCO"
+    },
+    {
+        "description": "Continental Scientific Drilling Coordination Office",
+        "logo": "http://geodex.org/images/logos/csdco.png",
+        "indexlocation": "./indexes/csdco_data",
+        "index": "csdcodata",
+        "name": "CSDCO_Data"
+    },
+    {
         "description": "EARTHCUBE Linked Earth Building Block",
+        "logo": "http://geodex.org/images/logos/linkedEarth.jpeg",
         "indexlocation": "./indexes/wikilinkedearth",
         "index": "linkedearth",
         "name": "LinkedEarth"
     },
     {
         "description": "Neotoma",
+        "logo": "http://geodex.org/images/logos/neotoma.png",
         "indexlocation": "./indexes/dataneotomadborg",
         "index": "neotoma",
         "name": "Neotoma"
     },
     {
         "description": "Interdisciplinary Earth Data Alliance ",
+        "logo": "http://geodex.org/images/logos/ieda_maplogo.png",
         "indexlocation": "./indexes/getiedadataorg",
         "index": "ieda",
         "name": "IEDA"
     },
     {
         "description": "BALTO",
+        "logo": "http://geodex.org/images/logos/EarthCubeLogo.png",
         "indexlocation": "./indexes/baltoopendaporg",
         "index": "balto",
         "name": "BALTO"
     },
     {
         "description": "MagIC",
+        "logo": "http://geodex.org/images/logos/magic.png",
         "indexlocation": "./indexes/earthreforg",
         "index": "magic",
         "name": "MagIC"
     },
     {
         "description": "Open Topography",
+        "logo": "http://geodex.org/images/logos/opentopo.png",
         "indexlocation": "./indexes/opentopographyorg",
         "index": "opentopographyorg",
         "name": "Open Topography"
     },
     {
         "description": "IRIS",
+        "logo": "http://geodex.org/images/logos/iris_color_screen_lrg.png",
         "indexlocation": "./indexes/dsirisedu",
         "index": "iris",
         "name": "IRIS"
     },
     {
+        "description": "Open Core Data",
+        "logo": "http://geodex.org/images/logos/ocd_logo.jpg",
+        "indexlocation": "./indexes/opencoredataorg",
+        "index": "ocd",
+        "name": "OpenCore"
+    },
+    {
         "description": "UNAVCO",
+        "logo": "http://geodex.org/images/logos/uv-logo.png",
         "indexlocation": "./indexes/wwwunavcoorg",
         "index": "unavco",
         "name": "UNAVCO"

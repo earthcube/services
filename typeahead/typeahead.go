@@ -13,6 +13,7 @@ type Provider struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	IndexName   string `json:"index"`
+	Logo        string `json:"logo"`
 }
 
 // New builds out the services calls for type ahead
@@ -49,6 +50,9 @@ func ProvidersCall(request *restful.Request, response *restful.Response) {
 	jsonParser := json.NewDecoder(ic)
 	jsonParser.Decode(&pa)
 
-	data, _ := json.Marshal(pa)
+	data, err := json.Marshal(pa)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	response.Write(data)
 }

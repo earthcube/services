@@ -1,9 +1,11 @@
 package textsearch
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"net/http"
 	"os"
@@ -11,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-resty/resty"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/blevesearch/bleve"
@@ -52,7 +55,7 @@ func New() *restful.WebService {
 
 		// add in start point and length cursors
 	service.Route(service.GET("/search").To(SearchCall).
-		Doc("Search call").
+		Doc("Query string search call").
 		Param(service.QueryParameter("q", "Query string").DataType("string")).
 		Param(service.QueryParameter("s", "Starting cursor point").DataType("int")).
 		Param(service.QueryParameter("n", "Number of results to return").DataType("int")).
@@ -61,14 +64,97 @@ func New() *restful.WebService {
 		Operation("SearchCall"))
 
 	service.Route(service.GET("/searchset").To(SearchSetCall).
-		Doc("Search set call").
+		Doc("Query string search call with grouped results").
 		Param(service.QueryParameter("q", "Query string").DataType("string")).
 		Param(service.QueryParameter("s", "Starting cursor point").DataType("int")).
 		Param(service.QueryParameter("n", "Number of results to return").DataType("int")).
 		Writes([]OrganicResults{}).
 		Operation("SearchSetCall"))
 
+	service.Route(service.POST("/nusearch").To(NuSearch).
+		Doc("BETA: Query string search call ").
+		Param(service.FormParameter("body", "The body containing query document")).
+		Consumes("multipart/form-data").
+		// Produces("plain/text").
+		ReturnsError(400, "Unable to handle request", nil).
+		Operation("NuSearch"))
+
+	service.Route(service.GET("/getnusearch").To(GETNuSearch).
+		Doc("BETA: Query string search call ").
+		Param(service.QueryParameter("q", "Query string").DataType("string")).
+		Operation("GETNuSearch"))
+
 	return service
+}
+
+// GETNuSearch is a test of the Blast search package
+func GETNuSearch(request *restful.Request, response *restful.Response) {
+
+	phrase := request.QueryParameter("q")
+
+	fmt.Printf("Body %s\n", phrase)
+
+	resp, err := resty.R().
+		SetBody(phrase).
+		Post("http://0.0.0.0:8000/rest/_search")
+	if err != nil {
+		log.Print(err)
+	}
+
+	fmt.Printf("\nInput: %s", phrase)
+	fmt.Printf("\nError: %v", err)
+	fmt.Printf("\nResponse Status Code: %v", resp.StatusCode())
+	fmt.Printf("\nResponse Status: %v", resp.Status())
+	fmt.Printf("\nResponse Time: %v", resp.Time())
+	fmt.Printf("\nResponse Received At: %v", resp.ReceivedAt())
+	fmt.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
+
+	response.Write([]byte(resp.String()))
+
+}
+
+// NuSearch is a test of the Blast search package
+func NuSearch(request *restful.Request, response *restful.Response) {
+
+	// body, err := request.BodyParameter("body")
+	// if err != nil {
+	// 	log.Printf("Error on body parameter read %v with %s \n", err, body)
+	// }
+	fmt.Println("In the nucall")
+	fmt.Print(request.Request.Form)
+
+	infile, _, err := request.Request.FormFile("body")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	sbnr := bufio.NewReader(infile)
+	body, err := ioutil.ReadAll(sbnr)
+	if err != nil {
+		fmt.Println(err)
+
+		return
+	}
+
+	fmt.Printf("Body %s\n", string(body))
+
+	resp, err := resty.R().
+		SetBody(body).
+		Post("http://0.0.0.0:8000/rest/_search")
+	if err != nil {
+		log.Print(err)
+	}
+
+	fmt.Printf("\nInput: %s", body)
+	fmt.Printf("\nError: %v", err)
+	fmt.Printf("\nResponse Status Code: %v", resp.StatusCode())
+	fmt.Printf("\nResponse Status: %v", resp.Status())
+	fmt.Printf("\nResponse Time: %v", resp.Time())
+	fmt.Printf("\nResponse Received At: %v", resp.ReceivedAt())
+	fmt.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
+
+	response.Write([]byte(resp.String()))
+
 }
 
 // SearchCall First test function..   opens each time..  not what we want..
