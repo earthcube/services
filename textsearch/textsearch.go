@@ -2,6 +2,7 @@ package textsearch
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,9 +13,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
-	"github.com/go-resty/resty"
 	log "github.com/sirupsen/logrus"
+	"github.com/valyala/fastjson"
+	"gopkg.in/resty.v1"
 
 	"github.com/blevesearch/bleve"
 	restful "github.com/emicklei/go-restful"
@@ -89,50 +92,62 @@ func New() *restful.WebService {
 
 // GETNuSearch is a test of the Blast search package
 func GETNuSearch(request *restful.Request, response *restful.Response) {
-
 	phrase := request.QueryParameter("q")
+	log.Printf("Body %s\n", phrase)
 
-	fmt.Printf("Body %s\n", phrase)
+	// addressing   {code: 4, message: "context deadline exceeded"}
+	// ctx := context.TODO()
+	ctx, cancel := context.WithTimeout(context.Background(), 8000*time.Millisecond)
+	defer cancel()
+
+	// u := "http://blast:10002/rest/_search"
+	u := "http://localhost:10002/rest/_search"
 
 	resp, err := resty.R().
-		SetBody(phrase).
-		Post("http://0.0.0.0:8000/rest/_search")
+		SetBody(phrase).SetContext(ctx).
+		Post(u)
 	if err != nil {
 		log.Print(err)
 	}
 
-	fmt.Printf("\nInput: %s", phrase)
-	fmt.Printf("\nError: %v", err)
-	fmt.Printf("\nResponse Status Code: %v", resp.StatusCode())
-	fmt.Printf("\nResponse Status: %v", resp.Status())
-	fmt.Printf("\nResponse Time: %v", resp.Time())
-	fmt.Printf("\nResponse Received At: %v", resp.ReceivedAt())
-	fmt.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
+	// If we excede the context time limit the first time try again...
+	// look for "message": "context deadline exceeded"  in resp.String()
+	s := fastjson.GetString([]byte(resp.String()), "error", "message")
+	if s == "context deadline exceede" {
+		log.Println("Try the search once more")
+		resp, err = resty.R().
+			SetBody(phrase).SetContext(ctx).
+			Post(u)
+		if err != nil {
+			log.Print(err)
+		}
+	}
+
+	log.Printf("\nInput: %s", phrase)
+	log.Printf("\nError: %v", err)
+	log.Printf("\nResponse Status Code: %v", resp.StatusCode())
+	log.Printf("\nResponse Status: %v", resp.Status())
+	log.Printf("\nResponse Time: %v", resp.Time())
+	log.Printf("\nResponse Received At: %v", resp.ReceivedAt())
+	log.Printf("\nResponse Body: %v", resp.String()) // or resp.String() or string(resp.Body())
 
 	response.Write([]byte(resp.String()))
-
 }
 
 // NuSearch is a test of the Blast search package
 func NuSearch(request *restful.Request, response *restful.Response) {
-
-	// body, err := request.BodyParameter("body")
-	// if err != nil {
-	// 	log.Printf("Error on body parameter read %v with %s \n", err, body)
-	// }
-	fmt.Println("In the nucall")
-	fmt.Print(request.Request.Form)
+	log.Println("In the nucall")
+	log.Print(request.Request.Form)
 
 	infile, _, err := request.Request.FormFile("body")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	sbnr := bufio.NewReader(infile)
 	body, err := ioutil.ReadAll(sbnr)
 	if err != nil {
-		fmt.Println(err)
-
+		log.Println(err)
 		return
 	}
 
@@ -140,21 +155,20 @@ func NuSearch(request *restful.Request, response *restful.Response) {
 
 	resp, err := resty.R().
 		SetBody(body).
-		Post("http://0.0.0.0:8000/rest/_search")
+		Post("http://blast:10002/rest/_search")
 	if err != nil {
 		log.Print(err)
 	}
 
-	fmt.Printf("\nInput: %s", body)
-	fmt.Printf("\nError: %v", err)
-	fmt.Printf("\nResponse Status Code: %v", resp.StatusCode())
-	fmt.Printf("\nResponse Status: %v", resp.Status())
-	fmt.Printf("\nResponse Time: %v", resp.Time())
-	fmt.Printf("\nResponse Received At: %v", resp.ReceivedAt())
-	fmt.Printf("\nResponse Body: %v", resp) // or resp.String() or string(resp.Body())
+	log.Printf("\nInput: %s", body)
+	log.Printf("\nError: %v", err)
+	log.Printf("\nResponse Status Code: %v", resp.StatusCode())
+	log.Printf("\nResponse Status: %v", resp.Status())
+	log.Printf("\nResponse Time: %v", resp.Time())
+	log.Printf("\nResponse Received At: %v", resp.ReceivedAt())
+	log.Printf("\nResponse Body: %v", resp.String()) // or resp.String() or string(resp.Body())
 
 	response.Write([]byte(resp.String()))
-
 }
 
 // SearchCall First test function..   opens each time..  not what we want..

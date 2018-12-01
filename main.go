@@ -6,7 +6,6 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"earthcube.org/Project418/services/shacl"
 	"earthcube.org/Project418/services/sparqlgateway"
 	"earthcube.org/Project418/services/spatialsearch"
 	"earthcube.org/Project418/services/textsearch"
@@ -57,8 +56,6 @@ func main() {
 	wsContainer.Add(typeahead.New())     // typeahead services
 	wsContainer.Add(sparqlgateway.New()) // graph services
 	wsContainer.Add(sparqlgateway.Dev()) // DEV graph services
-	wsContainer.Add(shacl.New())         // DEV graph services
-	// wsContainer.Add(graphsearch.New())  // text graph services
 
 	// Swagger
 	config := swagger.Config{

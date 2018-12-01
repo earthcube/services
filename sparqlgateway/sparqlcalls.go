@@ -2,6 +2,7 @@ package sparqlgateway
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -59,6 +60,53 @@ func getP418SPARQL() (*sparql.Repo, error) {
 		log.Printf("%s\n", err)
 	}
 	return repo, err
+}
+
+func getP418SPARQLRWG() (*sparql.Repo, error) {
+	repo, err := sparql.NewRepo("http://geodex.org/blazegraph/namespace/rwg2/sparql",
+		sparql.Timeout(time.Millisecond*15000),
+	)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+	return repo, err
+}
+
+// OrgCall takes a single resource and returns the variable measured property value
+func OrgCall(resource string) []byte {
+	repo, err := getP418SPARQLRWG()
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	f := bytes.NewBufferString(queries)
+	bank := sparql.LoadBank(f)
+
+	q, err := bank.Prepare("orgsearch", resource)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	log.WithFields(log.Fields{
+		"SPARQL": q,
+	}).Info("A SPARQL call in P418 services")
+
+	res, err := repo.Query(q)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+
+	// rr := &ResourceResults
+	b, err := json.MarshalIndent(res, " ", "")
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	// fmt.Println(string(b))
+
+	// return fmt.Sprintf("%v", res.Bindings())
+	// for this one don't return the map..  return JSON of the results
+	return b
 }
 
 // DescribeCall takes a single resource and returns the variable measured property value

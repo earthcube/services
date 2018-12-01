@@ -71,7 +71,23 @@ func Dev() *restful.WebService {
 		Writes([]LogoResults{}).
 		Operation("Describe"))
 
+	service.Route(service.GET("/orgsearch").To(Organizations).
+		Doc("Search an organization based on its description").
+		Param(service.QueryParameter("r", "Resource ID").DataType("string")).
+		Writes([]LogoResults{}).
+		Operation("Organizations"))
+
 	return service
+}
+
+func Organizations(request *restful.Request, response *restful.Response) {
+	resource := request.QueryParameter("r")
+
+	sr := OrgCall(resource)
+	// fmt.Println(sr)
+	// response.WriteJson(string(sr), " ")
+	response.AddHeader("Content-Type", "application/json")
+	response.Write(sr)
 }
 
 func Describe(request *restful.Request, response *restful.Response) {

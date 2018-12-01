@@ -1,3 +1,49 @@
+Need to connection
+
+prefix schema: <http://schema.org/>
+prefix bds: <http://www.bigdata.com/rdf/search#>
+select distinct ?s ?score ?rank
+where {
+   ?o bds:search "thermal" .  
+   ?s rdf:type schema:Dataset .
+   ?s schema:description ?o . 
+  ?o bds:minRelevance "0.25" .
+?o bds:relevance ?score .
+?o bds:maxRank "1000" .
+?o bds:rank ?rank .
+}
+ORDER BY DESC(?rank)
+
+prefix schema: <http://schema.org/>
+prefix bds: <http://www.bigdata.com/rdf/search#>
+select distinct ?pvs  ?s
+where {
+   ?o bds:search "age" .
+   ?s rdf:type schema:Dataset .
+   ?s schema:description ?o .
+  ?o bds:minRelevance "0.25" .
+?o bds:relevance ?score .
+?o bds:maxRank "1000" .
+?o bds:rank ?rank .
+  ?pvs <prov:hadMember> ?s
+}
+ORDER BY DESC(?rank)
+
+
+
+with the prov graph.  For each ?s connection 
+to a repo ?name and ?url (minimum).   Will need to 
+toss ?score and ?rank since these will make DISTINCT 
+pointless.  However, I could COUNT them to give 
+a COUNT to each org.  Still use the ORDER by though, 
+will it work to order by even with the order by var not 
+being in the select (DISTINCT) params?
+
+
+
+
+
+
 <a id="top"></a>
 ## Table of Contents ##
 * [Logo](#resource-logo)

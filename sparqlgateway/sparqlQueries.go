@@ -3,6 +3,19 @@ package sparqlgateway
 const queries = `
 # Comments are ignored, except those tagging a query.
 
+# tag: orgsearch
+prefix schema: <http://schema.org/>
+prefix bds: <http://www.bigdata.com/rdf/search#>
+select DISTINCT  ?name ?url ?desc
+where {
+  ?s rdf:type schema:Organization .
+  ?s schema:description ?desc .
+  ?s schema:name ?name .
+  ?s schema:url ?url .
+  ?desc bds:search "{{.}}" .
+}
+
+
 # tag: describeCall
 DESCRIBE <{{.}}>
 
