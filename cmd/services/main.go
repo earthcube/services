@@ -6,10 +6,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"earthcube.org/Project418/services/sparqlgateway"
-	"earthcube.org/Project418/services/spatialsearch"
-	"earthcube.org/Project418/services/textsearch"
-	"earthcube.org/Project418/services/typeahead"
+	"earthcube.org/Project418/services/internal/sparqlgateway"
+	"earthcube.org/Project418/services/internal/spatialsearch"
+	"earthcube.org/Project418/services/internal/textsearch"
+	"earthcube.org/Project418/services/internal/typeahead"
 	restful "github.com/emicklei/go-restful"
 	swagger "github.com/emicklei/go-restful-swagger12"
 )
