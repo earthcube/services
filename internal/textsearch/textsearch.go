@@ -100,8 +100,8 @@ func GETNuSearch(request *restful.Request, response *restful.Response) {
 	ctx, cancel := context.WithTimeout(context.Background(), 8000*time.Millisecond)
 	defer cancel()
 
-	// u := "http://blast:10002/rest/_search"
-	u := "http://localhost:10002/rest/_search"
+	u := "http://blast:10002/rest/_search"
+	//u := "http://localhost:10002/rest/_search"
 
 	resp, err := resty.R().
 		SetBody(phrase).SetContext(ctx).

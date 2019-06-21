@@ -1,0 +1,23 @@
+(move structus to pkg)
+
+
+typeahead
+nothing in it really...   has the providers call (with associated struct).   This is 
+something we can remove
+
+voclist 
+good sketch of functions in there!   however, nothing done here... 
+
+spatial     
+(keep as is with some clean up..    maintain this)
+
+textsearch  
+(keep as is with some clean up..    maintain this)
+take nusearch and getnusearch out (I am the only one using this??   search the notebooks and Eric code)
+
+graphs
+try to move from blaze to jena
+
+
+
+

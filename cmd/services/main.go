@@ -30,7 +30,7 @@ func init() {
 
 func main() {
 	// Set up our log file for runs...
-	f, err := os.OpenFile("./log/serviceslog.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile("./runtime/log/serviceslog.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}

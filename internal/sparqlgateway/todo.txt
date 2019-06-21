@@ -1,0 +1,6 @@
+
+each call should be a .go file.
+
+Then one mast graph.go  (with the New function in it to build the routes)
+
+Then one commons.go (with the structs)

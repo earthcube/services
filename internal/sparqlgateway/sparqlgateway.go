@@ -59,6 +59,13 @@ func Dev() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON) //Consumes(restful.M).
 
+	service.Route(service.GET("/temporal").To(Temporal).
+		Doc("Dev call for temporal data in the graph ").
+		Param(service.QueryParameter("b", "Resource ID").DataType("string")).
+		Param(service.QueryParameter("e", "Resource ID").DataType("string")).
+		Writes([]LogoResults{}).
+		Operation("Temporal"))
+
 	service.Route(service.GET("/logo").To(Logo).
 		Doc("Call for logo URL on a resource from the triplestore (graph)").
 		Param(service.QueryParameter("r", "Resource ID").DataType("string")).

@@ -59,7 +59,6 @@ WHERE {
   GRAPH ?graph {
     ?resource rdf:type ?type .
     OPTIONAL { ?resource schema:logo [ schema:url ?logo ] }
-    
   }
 }
 ORDER BY ?graph ?type ?resource ?logo
@@ -77,8 +76,8 @@ WHERE
   ?ID schema:variableMeasured ?res  .
   ?res a schema:PropertyValue .
   ?res schema:value ?val   .
-  ?res schema:description ?desc     
-} 
+  ?res schema:description ?desc
+}
 
 # tag: ResourceSetIGSN
 prefix schema: <http://schema.org/>
@@ -94,7 +93,7 @@ VALUES ?ID
  ?sample schema:additionalType "http://schema.geolink.org/1.0/base/main#PhysicalSample" .
  ?sample schema:identifier ?id .
  ?id schema:propertyID "IGSN" .
- ?id schema:value ?igsn .  
+ ?id schema:value ?igsn .
 }
 
 

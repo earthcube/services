@@ -72,6 +72,18 @@ func getP418SPARQLRWG() (*sparql.Repo, error) {
 	return repo, err
 }
 
+// DEVSPARQL   used only for local dev..  should be a flag based option in the call (a TODO)
+func DEVSPARQL() (*sparql.Repo, error) {
+	//repo, err := sparql.NewRepo("http://clear.local:3030/t2/query",
+	repo, err := sparql.NewRepo("http://clear.local:3030/t2/sparql",
+		sparql.Timeout(time.Millisecond*15000),
+	)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+	return repo, err
+}
+
 // OrgCall takes a single resource and returns the variable measured property value
 func OrgCall(resource string) []byte {
 	repo, err := getP418SPARQLRWG()
