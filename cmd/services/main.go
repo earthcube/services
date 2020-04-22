@@ -61,7 +61,7 @@ func main() {
 	config := swagger.Config{
 		WebServices:    wsContainer.RegisteredWebServices(), // you control what services are visible
 		ApiPath:        "/apidocs.json",
-		WebServicesUrl: "http://geodex.org"} // localhost:6789
+		WebServicesUrl: "http://geodex.local.earthcube.org"} // localhost:6789
 	swagger.RegisterSwaggerService(config, wsContainer)
 
 	// Start up
