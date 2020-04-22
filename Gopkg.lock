@@ -2,18 +2,23 @@
 
 
 [[projects]]
+  digest = "1:f8da5136f1ad2b96ba13b38590eae6239be75904afc4850da8057ad25988d3eb"
   name = "github.com/RoaringBitmap/roaring"
   packages = ["."]
+  pruneopts = ""
   revision = "6f670287d7ec5bb044dc8afcc8cb904113fd581a"
   version = "v0.4.4"
 
 [[projects]]
   branch = "master"
+  digest = "1:6ae849fd4cfda8751fa6332e63cbd6685bfa24027de5309d26b2d06c21003138"
   name = "github.com/Smerity/govarint"
   packages = ["."]
+  pruneopts = ""
   revision = "7265e41f48f15fd61751e16da866af3c704bb3ab"
 
 [[projects]]
+  digest = "1:35b1f0fb65dd639625d24ad63d22b8e802c3ab7ab871ba0113d49dadab8a287e"
   name = "github.com/blevesearch/bleve"
   packages = [
     ".",
@@ -51,171 +56,278 @@
     "search/highlight/highlighter/simple",
     "search/query",
     "search/scorer",
-    "search/searcher"
+    "search/searcher",
   ]
+  pruneopts = ""
   revision = "1a319cdf5bf77dc8cee35a6b99f908792c2547ef"
   version = "v0.7.0"
 
 [[projects]]
+  digest = "1:b9a6b4e079fea1e137c0f8caeb65030978a8dee9f37df5a6ffd9fabe98cdd32e"
   name = "github.com/blevesearch/go-porterstemmer"
   packages = ["."]
+  pruneopts = ""
   revision = "b4dd94e38f29620fe0f97ae4b0f6994b0d5d75f0"
   version = "v1.0.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:eb75e36e2b8b6a24e51dd1cd5692bfa0594003aeeb867a774d0ff1159fcb9ff9"
   name = "github.com/blevesearch/segment"
   packages = ["."]
+  pruneopts = ""
   revision = "762005e7a34fd909a84586299f1dd457371d36ee"
 
 [[projects]]
+  digest = "1:ed112122ed4a920d944cc99b9d00b0441c11685939c28462c719488d36fe29aa"
   name = "github.com/boltdb/bolt"
   packages = ["."]
+  pruneopts = ""
   revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
   version = "v1.3.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:252f242a9b3dab3c76d5d16aa5323c52646fce7a5167af70802bf8f4c3dce35a"
   name = "github.com/couchbase/vellum"
   packages = [
     ".",
     "regexp",
-    "utf8"
+    "utf8",
   ]
+  pruneopts = ""
   revision = "5083a469fcef50a4705e3c90652246ecd6806f2a"
 
 [[projects]]
   branch = "master"
+  digest = "1:4c4a331124d70560f6da77d5088c10215e28a4b7fc1ee81eb4bc8400c86761cc"
   name = "github.com/edsrzf/mmap-go"
   packages = ["."]
+  pruneopts = ""
   revision = "0bce6a6887123b67a60366d2c9fe2dfb74289d2e"
 
 [[projects]]
+  digest = "1:7ecdba447d1bed1bffb432777895e543235ca6df3c7bd0be85db63e1865bdedf"
   name = "github.com/emicklei/go-restful"
   packages = [
     ".",
-    "log"
+    "log",
   ]
+  pruneopts = ""
   revision = "2dd44038f0b95ae693b266c5f87593b5d2fdd78d"
   version = "v2.5.0"
 
 [[projects]]
+  digest = "1:cad2dd7061b8dcb4e0014d89e8070f185fb70ac9ba26acf27ff42b9c3eb0ff9b"
   name = "github.com/emicklei/go-restful-swagger12"
   packages = ["."]
+  pruneopts = ""
   revision = "dcef7f55730566d41eae5db10e7d6981829720f6"
   version = "1.0.1"
 
 [[projects]]
+  digest = "1:9edeb5a0bfb31fd45134c4d35865a4d08f310c0bc200901ce1370cb90494f3e2"
   name = "github.com/garyburd/redigo"
   packages = [
     "internal",
-    "redis"
+    "redis",
   ]
+  pruneopts = ""
   revision = "d1ed5c67e5794de818ea85e6b522fda02623a484"
   version = "v1.4.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:7e33fce0e76a165d0ab0eaab80af044082d056686ee1abf051e40170bd931fbc"
   name = "github.com/glycerine/go-unsnap-stream"
   packages = ["."]
+  pruneopts = ""
   revision = "9f0cb55181dd3a0a4c168d3dbc72d4aca4853126"
 
 [[projects]]
   branch = "master"
+  digest = "1:3b760d3b93f994df8eb1d9ebfad17d3e9e37edcb7f7efaa15b427c0d7a64f4e4"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = ""
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
   branch = "master"
+  digest = "1:09307dfb1aa3f49a2bf869dcfa4c6c06ecd3c207221bd1c1a1141f0e51f209eb"
   name = "github.com/golang/snappy"
   packages = ["."]
+  pruneopts = ""
   revision = "553a641470496b2327abcac10b36396bd98e45c9"
 
 [[projects]]
   branch = "master"
+  digest = "1:59935e1c1e29c3ee196031cf48d405b3bf33be61542806b9daaf989f6f6c180b"
   name = "github.com/knakk/digest"
   packages = ["."]
+  pruneopts = ""
   revision = "fd45becddc49e7c583e46de4af3b9b3b37e629e3"
 
 [[projects]]
   branch = "master"
+  digest = "1:82202e4cf453b595364b9376d79cf57f13f42f9fdcea5bf467b7844c2f3c1fd6"
   name = "github.com/knakk/rdf"
   packages = ["."]
+  pruneopts = ""
   revision = "b6ee24f8f40ff0580683aefb6831dad263a3f751"
 
 [[projects]]
   branch = "master"
+  digest = "1:b2e1d4fd6510f20859c819bcf74b0caf6ca303c8aff30786617c47beaa930480"
   name = "github.com/knakk/sparql"
   packages = ["."]
+  pruneopts = ""
   revision = "3de19ad6a5dcee30dd5e101b47e3aedc7f69ef57"
 
 [[projects]]
   branch = "master"
+  digest = "1:2b92866d98297fd59e1ae4eeac721ba59b9015bcf899e5575130481405ac0110"
   name = "github.com/mschoch/smat"
   packages = ["."]
+  pruneopts = ""
   revision = "90eadee771aeab36e8bf796039b8c261bebebe4f"
 
 [[projects]]
+  digest = "1:a648ca7f6c1430313327fa340e819808db0e17d009c985d31b837c7d16cd7632"
   name = "github.com/paulmach/go.geojson"
   packages = ["."]
+  pruneopts = ""
   revision = "aa3713dea4327980f5891ac781c6f1a45ea75c0f"
   version = "v1.3.1"
 
 [[projects]]
+  digest = "1:210286d0cb60ffe28f1ca00b664029e8943009f95d06d8f8c336301b28e1aee5"
   name = "github.com/philhofer/fwd"
   packages = ["."]
+  pruneopts = ""
   revision = "bb6d471dc95d4fe11e432687f8b70ff496cf3136"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:8cf46b6c18a91068d446e26b67512cf16f1540b45d90b28b9533706a127f0ca6"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
+  pruneopts = ""
   revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
   version = "v1.0.5"
 
 [[projects]]
   branch = "master"
+  digest = "1:49f625590d0a3a4d0db850eb233fd22b110c490aa8123589445924d2d47bbe0a"
   name = "github.com/steveyen/gtreap"
   packages = ["."]
+  pruneopts = ""
   revision = "0abe01ef9be25c4aedc174758ec2d917314d6d70"
 
 [[projects]]
+  digest = "1:cae65c1f3471b1f456a9d8a160440f4824ad50c718a15da4144490fbc3b12e49"
   name = "github.com/tinylib/msgp"
   packages = ["msgp"]
+  pruneopts = ""
   revision = "b2b6a672cf1e5b90748f79b8b81fc8c5cf0571a1"
   version = "1.0.2"
 
 [[projects]]
+  digest = "1:b7697204597c1ea9aaf713aae5681afd5dd94e721cf8538f595531e8f613ad48"
+  name = "github.com/valyala/fastjson"
+  packages = [
+    ".",
+    "fastfloat",
+  ]
+  pruneopts = ""
+  revision = "1649ca562796818045aab09b15c2218b07f752e9"
+  version = "v1.5.0"
+
+[[projects]]
+  digest = "1:2f13914a0456b82c0725dcdb7419284bdb1116d7439954d755b3d2641e6d31f0"
   name = "github.com/willf/bitset"
   packages = ["."]
+  pruneopts = ""
   revision = "d860f346b89450988a379d7d705e83c58d1ea227"
   version = "v1.1.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:51aff2b69272cb95713b74675c0817e0a0caadc20337a8d9115bc68bf1105280"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
+  pruneopts = ""
   revision = "b2aa35443fbc700ab74c586ae79b81c171851023"
 
 [[projects]]
   branch = "master"
+  digest = "1:f3ee2a699dd02cac37fbca1d028f1121ce0e48143a0f9abd293d3141dcfe6b92"
   name = "golang.org/x/net"
-  packages = ["context"]
+  packages = [
+    "context",
+    "idna",
+    "publicsuffix",
+  ]
+  pruneopts = ""
   revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
 
 [[projects]]
   branch = "master"
+  digest = "1:aba25123b0b02601b134eaf08bd84afe8e12cab70e43770e7b38d8eef8f1d93e"
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows"
+    "windows",
   ]
+  pruneopts = ""
   revision = "2c42eef0765b9837fbdab12011af7830f55f88f0"
+
+[[projects]]
+  digest = "1:740b51a55815493a8d0f2b1e0d0ae48fe48953bf7eaf3fcc4198823bf67768c0"
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/language",
+    "internal/language/compact",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable",
+  ]
+  pruneopts = ""
+  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
+  version = "v0.3.2"
+
+[[projects]]
+  digest = "1:218d6d3952eb109dd9001ef0249e2e5f7881e5b06b5700a072f9649dc6df2778"
+  name = "gopkg.in/resty.v1"
+  packages = ["."]
+  pruneopts = ""
+  revision = "fa5875c0caa5c260ab78acec5a244215a730247f"
+  version = "v1.12.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ddccea578a92dd3a927ead56c2b6dacb36aa48c6d73430307acf585230d1eaa5"
+  input-imports = [
+    "github.com/blevesearch/bleve",
+    "github.com/emicklei/go-restful",
+    "github.com/emicklei/go-restful-swagger12",
+    "github.com/garyburd/redigo/redis",
+    "github.com/knakk/sparql",
+    "github.com/paulmach/go.geojson",
+    "github.com/sirupsen/logrus",
+    "github.com/valyala/fastjson",
+    "gopkg.in/resty.v1",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
