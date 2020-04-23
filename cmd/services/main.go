@@ -1,8 +1,8 @@
 package main
 
 import (
+	"flag"
 	"net/http"
-	"os"
 
 	log "github.com/sirupsen/logrus"
 
@@ -14,28 +14,12 @@ import (
 	swagger "github.com/emicklei/go-restful-swagger12"
 )
 
-func init() {
-	// Log as JSON instead of the default ASCII formatter.
-	log.SetFormatter(&log.JSONFormatter{})
-
-	// Output to stdout instead of the default stderr, can be any io.Writer
-	// I override this and set output to file (io.Writer) in main
-	log.SetOutput(os.Stdout)
-
-	// Set log level
-	// Will log anything that is info or above (warn, error, fatal, panic). Default.
-	// only other level is debug
-	log.SetLevel(log.DebugLevel) // Info level for deployment
-}
 
 func main() {
-	// Set up our log file for runs...
-	f, err := os.OpenFile("./runtime/log/serviceslog.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
-	}
-	defer f.Close()
-	log.SetOutput(f)
+
+	var host string
+	flag.StringVar(&host, "host", "geodex.org", "Web services host")
+	flag.Parse()
 
 	wsContainer := restful.NewContainer()
 
@@ -61,7 +45,7 @@ func main() {
 	config := swagger.Config{
 		WebServices:    wsContainer.RegisteredWebServices(), // you control what services are visible
 		ApiPath:        "/apidocs.json",
-		WebServicesUrl: "http://geodex.local.earthcube.org"} // localhost:6789
+		WebServicesUrl: "http://" + host } 
 	swagger.RegisterSwaggerService(config, wsContainer)
 
 	// Start up
