@@ -1,6 +1,7 @@
 package spatialsearch
 
 import (
+	"earthcube.org/Project418/services/internal/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -22,7 +23,9 @@ type LocType struct {
 type URLSet []string
 
 func redisDial() (redis.Conn, error) {
-	c, err := redis.Dial("tcp", "tile38:9851")
+	u :=  utils.GetEnv("TILE38", "tile38:9851")
+	c, err := redis.Dial("tcp", u)
+	//c, err := redis.Dial("tcp", "tile38:9851")
 	// c, err := redis.Dial("tcp", "localhost:9851")
 	if err != nil {
 		log.Printf("Could not connect: %v\n", err)

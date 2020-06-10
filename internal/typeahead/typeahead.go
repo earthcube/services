@@ -1,6 +1,7 @@
 package typeahead
 
 import (
+	"earthcube.org/Project418/services/internal/utils"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -39,7 +40,8 @@ func New() *restful.WebService {
 
 // ProvidersCall returns the provider json package
 func ProvidersCall(request *restful.Request, response *restful.Response) {
-	ic, err := os.Open("./indexcatalog.json")
+	u := utils.GetEnv("INDEXCATALOG","./indexcatalog.json")
+	ic, err := os.Open(u)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

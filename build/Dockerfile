@@ -11,8 +11,8 @@ FROM scratch
 # later as the indexes grow
 ADD cmd/services/services /
 ADD configs/indexcatalog.json /
-COPY /runtime /runtime
-COPY /runtime/log /runtime/log
+#COPY /runtime /runtime
+#COPY /runtime/log /runtime/log
 #ADD scripts /scripts
 # ADD logs /logs  or mount in the volume in the compose or docker command
 

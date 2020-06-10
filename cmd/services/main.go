@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -10,6 +11,7 @@ import (
 	"earthcube.org/Project418/services/internal/spatialsearch"
 	"earthcube.org/Project418/services/internal/textsearch"
 	"earthcube.org/Project418/services/internal/typeahead"
+	"earthcube.org/Project418/services/internal/utils"
 	restful "github.com/emicklei/go-restful"
 	swagger "github.com/emicklei/go-restful-swagger12"
 )
@@ -30,12 +32,18 @@ func init() {
 
 func main() {
 	// Set up our log file for runs...
-	f, err := os.OpenFile("./runtime/log/serviceslog.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	serviceslogfile := utils.GetEnv("SERVICES_LOGFILE","./runtime/log/serviceslog.txt" )
+	f, err := os.OpenFile(serviceslogfile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
 	defer f.Close()
 	log.SetOutput(f)
+	// env
+	geodexBaseUrl := utils.GetEnv("GEODEX_BASEURL","http://geodex.org" )
+	geodexPort := utils.GetEnv("GEODEX_PORT",":6789" )
+
+	servicesBaseUrl := fmt.Sprintf("%s%s",geodexBaseUrl,geodexPort)
 
 	wsContainer := restful.NewContainer()
 
@@ -61,11 +69,11 @@ func main() {
 	config := swagger.Config{
 		WebServices:    wsContainer.RegisteredWebServices(), // you control what services are visible
 		ApiPath:        "/apidocs.json",
-		WebServicesUrl: "http://geodex.org"} // localhost:6789
+		WebServicesUrl: servicesBaseUrl} // localhost:6789
 	swagger.RegisterSwaggerService(config, wsContainer)
 
 	// Start up
-	log.Printf("Services on localhost:6789")
-	server := &http.Server{Addr: ":6789", Handler: wsContainer}
+	log.Printf("Services on %s %s", geodexBaseUrl, geodexPort)
+	server := &http.Server{Addr: geodexPort, Handler: wsContainer}
 	server.ListenAndServe()
 }

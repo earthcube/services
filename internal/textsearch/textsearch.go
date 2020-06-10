@@ -21,6 +21,7 @@ import (
 
 	"github.com/blevesearch/bleve"
 	restful "github.com/emicklei/go-restful"
+	"earthcube.org/Project418/services/internal/utils"
 )
 
 type Provider struct {
@@ -100,7 +101,8 @@ func GETNuSearch(request *restful.Request, response *restful.Response) {
 	ctx, cancel := context.WithTimeout(context.Background(), 8000*time.Millisecond)
 	defer cancel()
 
-	u := "http://blast:10002/rest/_search"
+	//u := "http://blast:10002/rest/_search"
+	u := utils.GetEnv("BLASTURL","http://blast:10002/rest/_search")
 	//u := "http://localhost:10002/rest/_search"
 
 	resp, err := resty.R().
@@ -152,10 +154,11 @@ func NuSearch(request *restful.Request, response *restful.Response) {
 	}
 
 	fmt.Printf("Body %s\n", string(body))
-
+	u := utils.GetEnv("BLASTURL","http://blast:10002/rest/_search")
 	resp, err := resty.R().
 		SetBody(body).
-		Post("http://blast:10002/rest/_search")
+		//Post("http://blast:10002/rest/_search")
+		Post(u)
 	if err != nil {
 		log.Print(err)
 	}

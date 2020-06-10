@@ -2,6 +2,7 @@ package sparqlgateway
 
 import (
 	"bytes"
+	"earthcube.org/Project418/services/internal/utils"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -53,7 +54,9 @@ type ResourceSetPeople struct {
 }
 
 func getP418SPARQL() (*sparql.Repo, error) {
-	repo, err := sparql.NewRepo("http://geodex.org/blazegraph/namespace/p418/sparql",
+	u := utils.GetEnv("SPARQL_EC", "http://geodex.org/blazegraph/namespace/p418/sparql")
+	//repo, err := sparql.NewRepo("http://geodex.org/blazegraph/namespace/p418/sparql",
+	repo, err := sparql.NewRepo(u,
 		sparql.Timeout(time.Millisecond*15000),
 	)
 	if err != nil {
@@ -63,7 +66,9 @@ func getP418SPARQL() (*sparql.Repo, error) {
 }
 
 func getP418SPARQLRWG() (*sparql.Repo, error) {
-	repo, err := sparql.NewRepo("http://geodex.org/blazegraph/namespace/rwg2/sparql",
+	u := utils.GetEnv("SPARQL_rwg2", "http://geodex.org/blazegraph/namespace/p418/sparql")
+	//repo, err := sparql.NewRepo("http://geodex.org/blazegraph/namespace/rwg2/sparql",
+	repo, err := sparql.NewRepo(u,
 		sparql.Timeout(time.Millisecond*15000),
 	)
 	if err != nil {
